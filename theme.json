@@ -1,0 +1,26 @@
+{
+  "id": "zen-command-palette",
+  "name": "Zen Command Palette",
+  "description": "A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.",
+  "author": "Bibek Bhusal",
+  "version": "1.7.3",
+  "updatedAt": "2025-12-27",
+  "tags": [
+    "command",
+    "palette",
+    "raycast",
+    "arc",
+    "productivity",
+    "zen browser",
+    "sine",
+    "urlbar"
+  ],
+  "fork": [
+    "zen"
+  ],
+  "preferences": "https://raw.githubusercontent.com/Vertex-Mods/Zen-Command-Palette/main/preferences.json",
+  "style": "https://raw.githubusercontent.com/Vertex-Mods/Zen-Command-Palette/main/style.css",
+  "js": true,
+  "readme": "https://raw.githubusercontent.com/Vertex-Mods/Zen-Command-Palette/main/readme.md",
+  "createdAt": "2024-09-07"
+}
