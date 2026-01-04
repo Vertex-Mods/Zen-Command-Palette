@@ -222,11 +222,18 @@
             align-items: center;
             padding: 8px;
             border-radius: 6px;
-            transition: background-color 0.2s;
+            transition:
+              background-color 0.2s,
+              box-shadow 0.2s;
 
             &:hover {
               background-color: rgba(127, 127, 127, 0.05);
             }
+          }
+
+          .command-item:has(.shortcut-input.conflict) {
+            background-color: rgba(255, 107, 107, 0.1);
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.15);
           }
 
           .command-icon {
@@ -263,6 +270,7 @@
               position: relative;
               display: flex;
               flex-direction: column;
+              margin-bottom: 4px;
             }
 
             .shortcut-input {
@@ -273,6 +281,10 @@
               border-radius: 4px !important;
               border: 1px solid rgba(127, 127, 127, 0.3) !important;
               background-color: rgba(0, 0, 0, 0.2) !important;
+              transition:
+                border-color 0.2s ease,
+                outline-color 0.2s ease,
+                background-color 0.2s ease;
 
               &:disabled {
                 opacity: 0.5 !important;
@@ -281,7 +293,8 @@
 
               &.conflict {
                 border-color: #ff6b6b !important;
-                outline-color: #ff6b6b !important;
+                outline: 2px solid #ff6b6b !important;
+                background-color: rgba(255, 107, 107, 0.1) !important;
               }
             }
 
