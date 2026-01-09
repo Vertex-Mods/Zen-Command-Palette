@@ -1,3 +1,6 @@
+> [!WARNING]
+> This is a beta version and may contain issues. Some bugs and breaking changes are expected.
+
 <h1 align="center">Zen Command Palette</h1>
 <div align="center">
     <a href="https://zen-browser.app/">
