@@ -3,7 +3,7 @@
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
 // @version         1.8.1b
-// @lastUpdated     2026-01-09
+// @lastUpdated     2026-01-15
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
