@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.3
-// @lastUpdated     2026-01-26
+// @version         1.8.4
+// @lastUpdated     2026-01-27
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -213,6 +213,7 @@
     {
       key: "cmd_zenChangeWorkspaceIcon",
       label: "Change Workspace Icon",
+      icon: "chrome://browser/skin/zen-icons/selectable/image.svg",
       tags: ["workspace", "icon", "change", "customize", "management"],
     },
     {
@@ -220,6 +221,12 @@
       label: "Create New Workspace",
       icon: "chrome://browser/skin/zen-icons/plus.svg",
       tags: ["workspace", "create", "new", "add", "management"],
+    },
+    {
+      key: "cmd_zenChangeWorkspaceName",
+      label: "Change Workspace Name",
+      icon: "chrome://global/skin/icons/edit.svg",
+      tags: ["workspace", "name", "rename", "edit", "management"],
     },
 
     // ----------- Zen Split View -----------
@@ -382,7 +389,7 @@
         document.getElementById("context_zen-edit-tab-icon")?.click();
       },
       condition: () => gBrowser?.selectedTab,
-      icon: "chrome://global/skin/icons/edit.svg",
+      icon: "chrome://browser/skin/zen-icons/selectable/image.svg",
       tags: ["tab", "icon", "edit", "change"],
     },
     {
@@ -1121,14 +1128,7 @@
   // Toast API based on sine toast
 
 
-  /**
-   * Debug logging function
-   * @param {...any} args - Arguments to log
-   */
   function debugLog(...args) {
-    {
-      console.log("[Toast API]", ...args);
-    }
   }
 
   /**
@@ -1143,10 +1143,8 @@
    * @param {string} [options.id] - Unique toast ID for duplicate prevention
    */
   function showToast(options = {}) {
-    debugLog("showToast called with options:", options);
 
     const { title, description, preset = 0, onClick, buttonText, timeout = 3000, id } = options;
-    debugLog("Parsed options:", { title, description, preset, buttonText, timeout, id });
 
     if (!title) {
       console.error("Toast: title is required");
@@ -1155,7 +1153,6 @@
 
     // Generate unique ID if not provided
     const toastId = id || `custom-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-    debugLog("Generated toast ID:", toastId);
 
     try {
       // Import the uc_api module
@@ -1286,7 +1283,6 @@
         debugLog("No browser window found for setTimeout");
       }
     } catch (error) {
-      debugLog("Error in showToast:", error);
       console.error("Toast API error:", error);
     }
   }
