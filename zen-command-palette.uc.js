@@ -2,7 +2,7 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.4
+// @version         1.8.5
 // @lastUpdated     2026-01-27
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
@@ -334,7 +334,11 @@
       label: "Toggle Collapsed Pins",
       tags: ["toggle", "collapse", "expand"],
       command: () => {
-        const cp = document.querySelector("zen-workspace-collapsible-pins");
+        const wsID = gZenWorkspaces.getActiveWorkspace().uuid;
+        if (!wsID) return;
+        const wsElem = document.querySelector(`[id="${wsID}"]`);
+        if (!wsElem) return;
+        const cp = wsElem.querySelector("zen-workspace-collapsible-pins");
         if (!cp) return;
         cp.collapsed = !cp.collapsed;
       },
@@ -853,7 +857,8 @@
         const labels = gBrowser.tabContainer.querySelectorAll(".tab-group-label");
         labels.forEach((label) => {
           const expanded = label.getAttribute("aria-expanded");
-          if (expanded === "true") {
+          const ariaLabel = label.getAttribute("aria-label");
+          if (expanded === "true" && ariaLabel !== "Unnamed Group") {
             label.focus();
             label.click();
           }
@@ -869,7 +874,8 @@
         const labels = gBrowser.tabContainer.querySelectorAll(".tab-group-label");
         labels.forEach((label) => {
           const expanded = label.getAttribute("aria-expanded");
-          if (expanded === "false") {
+          const ariaLabel = label.getAttribute("aria-label");
+          if (expanded === "false" && ariaLabel !== "Unnamed Group") {
             label.focus();
             label.click();
           }
