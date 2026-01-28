@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.5
-// @lastUpdated     2026-01-27
+// @version         1.8.6
+// @lastUpdated     2026-01-29
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -134,6 +134,134 @@
     }
   };
 
+  let _originalMaxResults = null;
+
+  class CommandPalettePREFS extends PREFS$1 {
+    static MOD_NAME = "zen-command-palette";
+    static DEBUG_MODE = "zen-command-palette.debug-mode";
+
+    static PREFIX = "zen-command-palette.prefix";
+    static PREFIX_REQUIRED = "zen-command-palette.prefix-required";
+    static MAX_COMMANDS = "zen-command-palette.max-commands";
+    static MAX_COMMANDS_PREFIX = "zen-command-palette.max-commands-prefix";
+    static MIN_QUERY_LENGTH = "zen-command-palette.min-query-length";
+    static MIN_SCORE_THRESHOLD = "zen-command-palette.min-score-threshold";
+    static DYNAMIC_ABOUT_PAGES = "zen-command-palette.dynamic.about-pages";
+    static DYNAMIC_SEARCH_ENGINES = "zen-command-palette.dynamic.search-engines";
+    static DYNAMIC_EXTENSIONS = "zen-command-palette.dynamic.extensions";
+    static DYNAMIC_WORKSPACES = "zen-command-palette.dynamic.workspaces";
+    static DYNAMIC_SINE_MODS = "zen-command-palette.dynamic.sine-mods";
+    static DYNAMIC_FOLDERS = "zen-command-palette.dynamic.folders";
+    static DYNAMIC_CONTAINER_TABS = "zen-command-palette.dynamic.container-tabs";
+    static DYNAMIC_ACTIVE_TABS = "zen-command-palette.dynamic.active-tabs";
+    static DYNAMIC_UNLOAD_TABS = "zen-command-palette.dynamic.unload-tab";
+    static DYNAMIC_EXTENSION_ENABLE_DISABLE = "zen-command-palette.dynamic.extension-enable-disable";
+    static DYNAMIC_EXTENSION_UNINSTALL = "zen-command-palette.dynamic.extension-uninstall";
+    static COMMAND_SETTINGS_FILE = "zen-command-palette.settings-file-path";
+
+    static defaultValues = {
+      [CommandPalettePREFS.PREFIX_REQUIRED]: false,
+      [CommandPalettePREFS.PREFIX]: ":",
+      [CommandPalettePREFS.DEBUG_MODE]: false,
+      [CommandPalettePREFS.MAX_COMMANDS]: 3,
+      [CommandPalettePREFS.MAX_COMMANDS_PREFIX]: 50,
+      [CommandPalettePREFS.MIN_QUERY_LENGTH]: 3,
+      [CommandPalettePREFS.MIN_SCORE_THRESHOLD]: 150,
+      [CommandPalettePREFS.DYNAMIC_ABOUT_PAGES]: false,
+      [CommandPalettePREFS.DYNAMIC_SEARCH_ENGINES]: true,
+      [CommandPalettePREFS.DYNAMIC_EXTENSIONS]: false,
+      [CommandPalettePREFS.DYNAMIC_WORKSPACES]: false,
+      [CommandPalettePREFS.DYNAMIC_SINE_MODS]: true,
+      [CommandPalettePREFS.DYNAMIC_FOLDERS]: true,
+      [CommandPalettePREFS.DYNAMIC_CONTAINER_TABS]: false,
+      [CommandPalettePREFS.DYNAMIC_ACTIVE_TABS]: false,
+      [CommandPalettePREFS.DYNAMIC_UNLOAD_TABS]: false,
+      [CommandPalettePREFS.DYNAMIC_EXTENSION_ENABLE_DISABLE]: false,
+      [CommandPalettePREFS.DYNAMIC_EXTENSION_UNINSTALL]: false,
+      [CommandPalettePREFS.COMMAND_SETTINGS_FILE]: "chrome/zen-commands-settings.json",
+    };
+
+    static get prefix() {
+      return this.getPref(this.PREFIX);
+    }
+
+    static get prefixRequired() {
+      return this.getPref(this.PREFIX_REQUIRED);
+    }
+
+    static get maxCommands() {
+      return this.getPref(this.MAX_COMMANDS);
+    }
+
+    static get maxCommandsPrefix() {
+      return this.getPref(this.MAX_COMMANDS_PREFIX);
+    }
+
+    static get minQueryLength() {
+      return this.getPref(this.MIN_QUERY_LENGTH);
+    }
+
+    static get minScoreThreshold() {
+      return this.getPref(this.MIN_SCORE_THRESHOLD);
+    }
+
+    static get loadAboutPages() {
+      return this.getPref(this.DYNAMIC_ABOUT_PAGES);
+    }
+
+    static get loadSearchEngines() {
+      return this.getPref(this.DYNAMIC_SEARCH_ENGINES);
+    }
+
+    static get loadExtensions() {
+      return this.getPref(this.DYNAMIC_EXTENSIONS);
+    }
+
+    static get loadWorkspaces() {
+      return this.getPref(this.DYNAMIC_WORKSPACES);
+    }
+
+    static get loadSineMods() {
+      return this.getPref(this.DYNAMIC_SINE_MODS);
+    }
+
+    static get loadFolders() {
+      return this.getPref(this.DYNAMIC_FOLDERS);
+    }
+
+    static get loadContainerTabs() {
+      return this.getPref(this.DYNAMIC_CONTAINER_TABS);
+    }
+
+    static get loadActiveTabs() {
+      return this.getPref(this.DYNAMIC_ACTIVE_TABS);
+    }
+
+    static get commandSettingsFile() {
+      return this.getPref(this.COMMAND_SETTINGS_FILE);
+    }
+
+    static setTempMaxRichResults(value) {
+      if (_originalMaxResults === null) {
+        _originalMaxResults = this.getPref("browser.urlbar.maxRichResults", 10);
+      }
+      this.setPref("browser.urlbar.maxRichResults", value);
+    }
+
+    static resetTempMaxRichResults() {
+      if (_originalMaxResults !== null) {
+        this.setPref("browser.urlbar.maxRichResults", _originalMaxResults);
+        _originalMaxResults = null;
+      }
+    }
+  }
+
+  const PREFS = CommandPalettePREFS;
+
+  function isNotEmptyTab() {
+    return !window.gBrowser.selectedTab.hasAttribute("zen-empty-tab");
+  }
+
   // This file is adapted from the command list in ZBar-Zen by Darsh-A
   // https://github.com/Darsh-A/ZBar-Zen/blob/main/command_bar.uc.js
 
@@ -155,10 +283,6 @@
     if (typeof pref === "boolean") return;
     setPref(!pref);
   };
-
-  function isNotEmptyTab() {
-    return !window.gBrowser.selectedTab.hasAttribute("zen-empty-tab");
-  }
 
   function isPinnedTabDifferent() {
     if (!window.gZenPinnedTabManager) return false;
@@ -509,6 +633,12 @@
       icon: "chrome://browser/skin/zen-icons/close.svg",
       tags: ["unload", "sleep"],
     },
+    {
+      key: "cmd_zenCloseUnpinnedTabs",
+      label: "Clear Other Tabs",
+      icon: svgToUrl(icons["broom"]),
+      tags: ["clear", "tabs", "close", "other", "workspace", "clean", "unpinned"],
+    },
 
     // ----------- Window Management -----------
     {
@@ -577,12 +707,14 @@
       label: "Search Bookmarks",
       icon: "chrome://browser/skin/zen-icons/search-glass.svg",
       tags: ["search", "bookmarks", "find", "filter"],
+      openUrl: true,
     },
     {
       key: "History:SearchHistory",
       label: "Search History",
       icon: "chrome://browser/skin/zen-icons/search-glass.svg",
       tags: ["search", "history", "find", "browse"],
+      openUrl: true,
     },
     {
       key: "Browser:ShowAllBookmarks",
@@ -834,13 +966,19 @@
       command: () => ZenCommandPalette.Settings.show("custom-commands"),
       tags: ["command", "palette", "custom", "more"],
     },
-
     {
-      key: "cmd_zenCloseUnpinnedTabs",
-      label: "Clear Other Tabs",
-      icon: svgToUrl(icons["broom"]),
-      tags: ["clear", "tabs", "close", "other", "workspace", "clean", "unpinned"],
+      key: "command-palette:show",
+      label: "Search Commands",
+      command: () => {
+        gURLBar.value = PREFS.prefix;
+        gURLBar.focus();
+        gZenUIManager.onUrlbarOpen();
+        gZenUIManager.onFloatingURLBarOpen();
+      },
+      tags: ["commands", "palette", "all", "shortcuts"],
+      openUrl: true,
     },
+
     // ----------- Tidy Tabs --------
     {
       key: "cmd_zenSortTabs",
@@ -921,130 +1059,6 @@
     }
     return fallbackIcon;
   }
-
-  let _originalMaxResults = null;
-
-  class CommandPalettePREFS extends PREFS$1 {
-    static MOD_NAME = "zen-command-palette";
-    static DEBUG_MODE = "zen-command-palette.debug-mode";
-
-    static PREFIX = "zen-command-palette.prefix";
-    static PREFIX_REQUIRED = "zen-command-palette.prefix-required";
-    static MAX_COMMANDS = "zen-command-palette.max-commands";
-    static MAX_COMMANDS_PREFIX = "zen-command-palette.max-commands-prefix";
-    static MIN_QUERY_LENGTH = "zen-command-palette.min-query-length";
-    static MIN_SCORE_THRESHOLD = "zen-command-palette.min-score-threshold";
-    static DYNAMIC_ABOUT_PAGES = "zen-command-palette.dynamic.about-pages";
-    static DYNAMIC_SEARCH_ENGINES = "zen-command-palette.dynamic.search-engines";
-    static DYNAMIC_EXTENSIONS = "zen-command-palette.dynamic.extensions";
-    static DYNAMIC_WORKSPACES = "zen-command-palette.dynamic.workspaces";
-    static DYNAMIC_SINE_MODS = "zen-command-palette.dynamic.sine-mods";
-    static DYNAMIC_FOLDERS = "zen-command-palette.dynamic.folders";
-    static DYNAMIC_CONTAINER_TABS = "zen-command-palette.dynamic.container-tabs";
-    static DYNAMIC_ACTIVE_TABS = "zen-command-palette.dynamic.active-tabs";
-    static DYNAMIC_UNLOAD_TABS = "zen-command-palette.dynamic.unload-tab";
-    static DYNAMIC_EXTENSION_ENABLE_DISABLE = "zen-command-palette.dynamic.extension-enable-disable";
-    static DYNAMIC_EXTENSION_UNINSTALL = "zen-command-palette.dynamic.extension-uninstall";
-    static COMMAND_SETTINGS_FILE = "zen-command-palette.settings-file-path";
-
-    static defaultValues = {
-      [CommandPalettePREFS.PREFIX_REQUIRED]: false,
-      [CommandPalettePREFS.PREFIX]: ":",
-      [CommandPalettePREFS.DEBUG_MODE]: false,
-      [CommandPalettePREFS.MAX_COMMANDS]: 3,
-      [CommandPalettePREFS.MAX_COMMANDS_PREFIX]: 50,
-      [CommandPalettePREFS.MIN_QUERY_LENGTH]: 3,
-      [CommandPalettePREFS.MIN_SCORE_THRESHOLD]: 150,
-      [CommandPalettePREFS.DYNAMIC_ABOUT_PAGES]: false,
-      [CommandPalettePREFS.DYNAMIC_SEARCH_ENGINES]: true,
-      [CommandPalettePREFS.DYNAMIC_EXTENSIONS]: false,
-      [CommandPalettePREFS.DYNAMIC_WORKSPACES]: false,
-      [CommandPalettePREFS.DYNAMIC_SINE_MODS]: true,
-      [CommandPalettePREFS.DYNAMIC_FOLDERS]: true,
-      [CommandPalettePREFS.DYNAMIC_CONTAINER_TABS]: false,
-      [CommandPalettePREFS.DYNAMIC_ACTIVE_TABS]: false,
-      [CommandPalettePREFS.DYNAMIC_UNLOAD_TABS]: false,
-      [CommandPalettePREFS.DYNAMIC_EXTENSION_ENABLE_DISABLE]: false,
-      [CommandPalettePREFS.DYNAMIC_EXTENSION_UNINSTALL]: false,
-      [CommandPalettePREFS.COMMAND_SETTINGS_FILE]: "chrome/zen-commands-settings.json",
-    };
-
-    static get prefix() {
-      return this.getPref(this.PREFIX);
-    }
-
-    static get prefixRequired() {
-      return this.getPref(this.PREFIX_REQUIRED);
-    }
-
-    static get maxCommands() {
-      return this.getPref(this.MAX_COMMANDS);
-    }
-
-    static get maxCommandsPrefix() {
-      return this.getPref(this.MAX_COMMANDS_PREFIX);
-    }
-
-    static get minQueryLength() {
-      return this.getPref(this.MIN_QUERY_LENGTH);
-    }
-
-    static get minScoreThreshold() {
-      return this.getPref(this.MIN_SCORE_THRESHOLD);
-    }
-
-    static get loadAboutPages() {
-      return this.getPref(this.DYNAMIC_ABOUT_PAGES);
-    }
-
-    static get loadSearchEngines() {
-      return this.getPref(this.DYNAMIC_SEARCH_ENGINES);
-    }
-
-    static get loadExtensions() {
-      return this.getPref(this.DYNAMIC_EXTENSIONS);
-    }
-
-    static get loadWorkspaces() {
-      return this.getPref(this.DYNAMIC_WORKSPACES);
-    }
-
-    static get loadSineMods() {
-      return this.getPref(this.DYNAMIC_SINE_MODS);
-    }
-
-    static get loadFolders() {
-      return this.getPref(this.DYNAMIC_FOLDERS);
-    }
-
-    static get loadContainerTabs() {
-      return this.getPref(this.DYNAMIC_CONTAINER_TABS);
-    }
-
-    static get loadActiveTabs() {
-      return this.getPref(this.DYNAMIC_ACTIVE_TABS);
-    }
-
-    static get commandSettingsFile() {
-      return this.getPref(this.COMMAND_SETTINGS_FILE);
-    }
-
-    static setTempMaxRichResults(value) {
-      if (_originalMaxResults === null) {
-        _originalMaxResults = this.getPref("browser.urlbar.maxRichResults", 10);
-      }
-      this.setPref("browser.urlbar.maxRichResults", value);
-    }
-
-    static resetTempMaxRichResults() {
-      if (_originalMaxResults !== null) {
-        this.setPref("browser.urlbar.maxRichResults", _originalMaxResults);
-        _originalMaxResults = null;
-      }
-    }
-  }
-
-  const PREFS = CommandPalettePREFS;
 
   const DEFAULTS = {
     hiddenCommands: [],
@@ -1453,6 +1467,7 @@
         },
         icon: getSearchEngineFavicon(engine),
         tags: ["search", "engine", engineName.toLowerCase()],
+        openUrl: true,
       };
     });
   }
@@ -1621,7 +1636,6 @@
    */
   async function generateActiveTabCommands() {
     const commands = [];
-    // Use gZenWorkspaces.allStoredTabs to get tabs from all workspaces in the current window.
     const tabs = window.gZenWorkspaces?.workspaceEnabled
       ? window.gZenWorkspaces.allStoredTabs
       : Array.from(gBrowser.tabs);
@@ -1850,16 +1864,17 @@
    * Generates commands for moving the active tab to a different workspace.
    * @returns {Promise<Array<object>>} A promise that resolves to an array of workspace-move commands.
    */
-  async function generateWorkspaceMoveCommands() {
+  function generateWorkspaceMoveCommands() {
     if (!window.gZenWorkspaces?.workspaceEnabled) return [];
 
     const commands = [];
-    const workspacesData = await window.gZenWorkspaces._workspaces();
-    if (!workspacesData || !workspacesData.workspaces) return [];
+    const workspacesData = window.gZenWorkspaces.getWorkspaces();
+    if (!isNotEmptyTab()) return [];
+    if (!workspacesData) return [];
 
     const activeTab = gBrowser.selectedTab;
     if (activeTab && !activeTab.hasAttribute("zen-essential")) {
-      workspacesData.workspaces.forEach((workspace) => {
+      workspacesData.forEach((workspace) => {
         if (activeTab.getAttribute("zen-workspace-id") === workspace.uuid) {
           return;
         }
@@ -1871,17 +1886,12 @@
             const tabToMove = gBrowser.selectedTab;
             if (tabToMove) {
               gZenWorkspaces.moveTabToWorkspace(tabToMove, workspace.uuid);
-              gZenWorkspaces._lastSelectedWorkspaceTabs[workspace.uuid] = tabToMove;
-              gZenWorkspaces.changeWorkspaceWithID(workspace.uuid);
+              gZenWorkspaces.switchTabIfNeeded(tabToMove);
             }
           },
           condition: () => {
             const currentTab = gBrowser.selectedTab;
-            return (
-              currentTab &&
-              !currentTab.hasAttribute("zen-essential") &&
-              currentTab.getAttribute("zen-workspace-id") !== workspace.uuid
-            );
+            return !!currentTab;
           },
           tags: ["workspace", "move", "tab", workspace.name.toLowerCase()],
         });
@@ -2076,11 +2086,22 @@
     },
 
     async saveSettings() {
+      const defaultShortcuts = this._mainModule._getDefaultShortcuts();
+      const filteredCustomShortcuts = {};
+      for (const [commandKey, shortcut] of Object.entries(
+        this._currentSettings.customShortcuts || {}
+      )) {
+        // Only save if: shortcut is not a default shortcut
+        if (shortcut && defaultShortcuts[commandKey] !== shortcut) {
+          filteredCustomShortcuts[commandKey] = shortcut;
+        }
+      }
+
       // Collect settings from UI
       const newSettings = {
         hiddenCommands: [],
         customIcons: { ...this._currentSettings.customIcons },
-        customShortcuts: { ...this._currentSettings.customShortcuts },
+        customShortcuts: filteredCustomShortcuts,
         toolbarButtons: [...(this._currentSettings.toolbarButtons || [])],
         customCommands: [...(this._currentSettings.customCommands || [])],
       };
@@ -2440,7 +2461,7 @@
           const conflictDetails = conflictCheck.conflicts
             .map((c) => (c.source === "zen" ? `Zen: ${c.id}` : `Custom: ${c.id}`))
             .join(", ");
-          conflictWarning.textContent = `⚠️ Conflict: ${conflictDetails}`;
+          conflictWarning.textContent = `Conflict: ${conflictDetails}`;
           conflictWarning.title = `Conflicts with: ${conflictDetails}`;
           conflictWarning.setAttribute("aria-label", `Conflicts with: ${conflictDetails}`);
           conflictWarning.hidden = false;
@@ -3434,6 +3455,23 @@
     }
   }
 
+  function doCommand(command) {
+    const commandEl = document.getElementById(command);
+    if (commandEl?.doCommand) {
+      commandEl.doCommand();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function openUrl(timeout = 0) {
+    setTimeout(() => {
+      PREFS.debugLog("opening URL bar");
+      doCommand("Browser:OpenLocation");
+    }, timeout);
+  }
+
   const ZenCommandPalette = {
     _shortcutRegistry: new ShortcutRegistry(),
     /**
@@ -3862,12 +3900,14 @@
       if (cmdToExecute) {
         PREFS.debugLog("Executing command via key:", key);
         this.addRecentCommand(cmdToExecute);
+        let openUrlBar = cmdToExecute.openUrl;
         if (typeof cmdToExecute.command === "function") {
           cmdToExecute.command(window);
+          if (openUrlBar) openUrl();
         } else {
-          const commandEl = document.getElementById(cmdToExecute.key);
-          if (commandEl?.doCommand) {
-            commandEl.doCommand();
+          const success = doCommand(cmdToExecute.key);
+          if (success) {
+            if (openUrlBar) openUrl();
           } else {
             PREFS.debugError(`Command element not found for key: ${key}`);
           }
@@ -4018,6 +4058,16 @@
     },
 
     /**
+     * Returns the default shortcuts object
+     */
+    _getDefaultShortcuts() {
+      return {
+        "command-palette:settings-commands": "Ctrl+,",
+        "command-palette:show": "Ctrl+Shift+p",
+      };
+    },
+
+    /**
      * Patches the native global actions array with user customizations like hidden commands and icons.
      */
     applyNativeOverrides() {
@@ -4050,29 +4100,22 @@
      * Applies custom shortcuts using event listeners.
      */
     applyCustomShortcuts() {
-      if (!this._userConfig.customShortcuts) {
-        PREFS.debugLog("No custom shortcuts to apply on initial load.");
-        return;
+      const defaultShortcuts = this._getDefaultShortcuts();
+      const customShortcuts = this._userConfig.customShortcuts || {};
+
+      for (const [commandKey, shortcutStr] of Object.entries(defaultShortcuts)) {
+        if (!customShortcuts[commandKey]) customShortcuts[commandKey] = shortcutStr;
       }
 
       let appliedCount = 0;
-      let conflictCount = 0;
 
-      for (const [commandKey, shortcutStr] of Object.entries(this._userConfig.customShortcuts)) {
+      for (const [commandKey, shortcutStr] of Object.entries(customShortcuts)) {
         if (!shortcutStr) continue;
         const result = this.addHotkey(commandKey, shortcutStr);
-        if (result.success) {
-          appliedCount++;
-        } else {
-          conflictCount++;
-          PREFS.debugError(
-            `Skipping shortcut for "${commandKey}" due to conflict: ${shortcutStr}`,
-            result.conflictInfo
-          );
-        }
+        if (result.success) appliedCount++;
       }
 
-      PREFS.debugLog(`Applied ${appliedCount} shortcuts, skipped ${conflictCount} due to conflicts.`);
+      PREFS.debugLog(`Applied ${appliedCount} shortcuts`);
     },
 
     async applyToolbarButtons() {
