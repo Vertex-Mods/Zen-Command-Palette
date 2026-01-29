@@ -2,7 +2,7 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.6
+// @version         1.8.7
 // @lastUpdated     2026-01-29
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
@@ -1935,7 +1935,7 @@
             if (typeof step === "string") {
               // It's a regular command key
               await new Promise((resolve) => setTimeout(resolve, 50));
-              ZenCommandPalette.executeCommandByKey(step);
+              ZenCommandPalette.executeCommand(step);
             } else if (typeof step === "object" && step.action && commandChainUtils[step.action]) {
               // It's a utility function call
               await commandChainUtils[step.action](step.params || {});
@@ -1980,6 +1980,226 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&apos;");
   };
+
+  /**
+   * Creates a unique signature for a keyboard shortcut.
+   * @param {KeyboardEvent} event - The keyboard event.
+   * @returns {string} A unique signature string.
+   */
+  function eventToShortcutSignature(event) {
+    const modifiers = [];
+    if (event.ctrlKey || event.metaKey) modifiers.push("ctrl");
+    if (event.altKey) modifiers.push("alt");
+    if (event.shiftKey) modifiers.push("shift");
+    modifiers.push(normalizeKeyName(event.key));
+    return modifiers.join("+");
+  }
+
+  function normalizeKeyName(key) {
+    if (!key) return "";
+    const k = key.toLowerCase();
+    if (k === " " || k === "space" || k === "spacebar") return "space";
+    return k;
+  }
+
+  /**
+   * Creates a unique signature for a shortcut string.
+   * @param {string} shortcutStr - The shortcut string (e.g., "Ctrl+K").
+   * @returns {string} A unique signature string.
+   */
+  function shortcutStringToSignature(shortcutStr) {
+    if (!shortcutStr) return "";
+    return shortcutStr
+      .toLowerCase()
+      .replace(/control/g, "ctrl")
+      .replace(/option/g, "alt")
+      .split("+")
+      .map((s) => normalizeKeyName(s.trim()))
+      .join("+");
+  }
+
+  /**
+   * Parses a shortcut string into a normalized object.
+   * @param {string} shortcutStr - The shortcut string (e.g., "Ctrl+Shift+K").
+   * @returns {{key: string, ctrl: boolean, alt: boolean, shift: boolean, meta: boolean}}
+   */
+  function parseStringToShortcut(shortcutStr) {
+    const parts = shortcutStr
+      .toLowerCase()
+      .split("+")
+      .map((p) => p.trim());
+    const keyPart = parts.pop();
+
+    return {
+      key: normalizeKeyName(keyPart),
+      ctrl: parts.includes("ctrl") || parts.includes("control"),
+      alt: parts.includes("alt"),
+      shift: parts.includes("shift"),
+      meta: parts.includes("meta") || parts.includes("cmd") || parts.includes("win"),
+    };
+  }
+
+  /**
+   * Checks if two shortcuts are equal (platform-aware).
+   * @param {{key: string, ctrl: boolean, alt: boolean, shift: boolean, meta: boolean}} shortcut1
+   * @param {{key: string, ctrl: boolean, alt: boolean, shift: boolean, meta: boolean}} shortcut2
+   * @returns {boolean}
+   */
+  function shortcutsEqual(shortcut1, shortcut2) {
+    const isMacOS = navigator.platform.indexOf("Mac") === 0;
+
+    if (shortcut1.key !== shortcut2.key) {
+      return false;
+    }
+
+    if (shortcut1.alt !== shortcut2.alt || shortcut1.shift !== shortcut2.shift) {
+      return false;
+    }
+
+    if (isMacOS) {
+      const ctrl1 = shortcut1.ctrl || shortcut1.meta;
+      const ctrl2 = shortcut2.ctrl || shortcut2.meta;
+      return ctrl1 === ctrl2;
+    } else {
+      const ctrl1 = shortcut1.ctrl || shortcut1.meta;
+      const ctrl2 = shortcut2.ctrl || shortcut2.meta;
+      return ctrl1 === ctrl2 && shortcut1.meta === shortcut2.meta;
+    }
+  }
+
+  let _shortcuts = new Map();
+
+  /**
+   * Checks for conflicts with Zen's native shortcuts.
+   * @param {string} shortcutStr - The shortcut string to check.
+   * @param {string} excludeId - The ID to exclude from conflict check (usually the current shortcut's ID).
+   * @returns {{hasConflict: boolean, conflictInfo?: {shortcut: string, id: string}}}
+   */
+  function checkZenConflict(shortcutStr, excludeId = null) {
+    if (
+      !window.gZenKeyboardShortcutsManager ||
+      !window.gZenKeyboardShortcutsManager._currentShortcutList
+    ) {
+      return { hasConflict: false };
+    }
+
+    const parsed = parseStringToShortcut(shortcutStr);
+
+    for (const shortcut of window.gZenKeyboardShortcutsManager._currentShortcutList) {
+      if (shortcut.getID() === excludeId) {
+        continue;
+      }
+
+      const zenShortcut = {
+        key: shortcut.getKeyName()?.toLowerCase() || "",
+        ctrl: shortcut.getModifiers().control || shortcut.getModifiers().accel,
+        alt: shortcut.getModifiers().alt,
+        shift: shortcut.getModifiers().shift,
+        meta: shortcut.getModifiers().meta,
+      };
+
+      if (shortcutsEqual(parsed, zenShortcut)) {
+        return {
+          hasConflict: true,
+          conflictInfo: {
+            shortcut: shortcut.toDisplayString(),
+            id: shortcut.getID(),
+          },
+        };
+      }
+    }
+
+    return { hasConflict: false };
+  }
+
+  /**
+   * Handles keydown events and executes matching shortcuts.
+   * @param {KeyboardEvent} event - The keyboard event.
+   */
+  function handleKeyDown(event) {
+    const signature = eventToShortcutSignature(event);
+    const shortcut = _shortcuts.get(signature);
+
+    if (shortcut) {
+      event.preventDefault();
+      event.stopPropagation();
+      shortcut.callback(event);
+    }
+  }
+
+  /**
+   * Initializes the registry and starts listening for keyboard events.
+   */
+  function initShortcutRegistry() {
+    window.addEventListener("keydown", handleKeyDown, true);
+  }
+
+  /**
+   * Destroys the registry and removes all event listeners.
+   */
+  function destroyShortcutRegistry() {
+    window.removeEventListener("keydown", handleKeyDown, true);
+    _shortcuts.clear();
+  }
+
+  /**
+   * Registers a new keyboard shortcut.
+   * @param {string} shortcutStr - The shortcut string (e.g., "Ctrl+Shift+K").
+   * @param {string} id - A unique identifier for this shortcut.
+   * @param {Function} callback - The function to execute when the shortcut is triggered.
+   * @returns {boolean} True if registration was successful, false otherwise.
+   */
+  function registerShortcut(shortcutStr, id, callback) {
+    if (!shortcutStr || !id || typeof callback !== "function") {
+      console.error("registerShortcutInRegistry: Invalid arguments", { shortcutStr, id, callback });
+      return false;
+    }
+    unregisterShortcutById(id);
+
+    const signature = shortcutStringToSignature(shortcutStr);
+    _shortcuts.set(signature, { id, callback, shortcutStr });
+    return true;
+  }
+
+  /**
+   * Unregisters a shortcut by its ID.
+   * @param {string} id - The ID of the shortcut to unregister.
+   * @returns {boolean} True if unregistration was successful, false otherwise.
+   */
+  function unregisterShortcutById(id) {
+    for (const [signature, shortcut] of _shortcuts.entries()) {
+      if (shortcut.id === id) {
+        _shortcuts.delete(signature);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checks for conflicts with a given shortcut string.
+   * @param {string} shortcutStr - The shortcut string to check.
+   * @param {string} [excludeId] - An ID to exclude from conflict checking.
+   * @returns {{hasConflict: boolean, conflicts: Array<{shortcut: string, id: string}>}}
+   */
+  function checkShortcutConflicts(shortcutStr, excludeId = null) {
+    const conflicts = [];
+
+    const existingShortcut = _shortcuts.get(shortcutStringToSignature(shortcutStr));
+    if (existingShortcut && existingShortcut.id !== excludeId) {
+      conflicts.push({ shortcut: shortcutStr, id: existingShortcut.id, source: "custom" });
+    }
+
+    const zenConflict = checkZenConflict(shortcutStr, excludeId);
+    if (zenConflict.hasConflict) {
+      conflicts.push({ ...zenConflict.conflictInfo, source: "zen" });
+    }
+
+    return {
+      hasConflict: conflicts.length > 0,
+      conflicts,
+    };
+  }
 
   const commandChainFunctions = {
     delay: {
@@ -2169,13 +2389,8 @@
 
         // Add/update new shortcuts
         for (const [commandKey, shortcutStr] of Object.entries(newShortcuts)) {
-          if (oldShortcuts[commandKey] !== shortcutStr) {
-            if (oldShortcuts[commandKey]) {
-              this._mainModule.removeHotkey(commandKey);
-            }
-            if (shortcutStr) {
-              this._mainModule.addHotkey(commandKey, shortcutStr);
-            }
+          if (shortcutStr && oldShortcuts[commandKey] !== shortcutStr) {
+            this._mainModule.addHotkey(commandKey, shortcutStr);
           }
         }
       }
@@ -2441,17 +2656,8 @@
         return;
       }
 
-      let shortcutString = "";
-      if (event.ctrlKey) shortcutString += "Ctrl+";
-      if (event.altKey) shortcutString += "Alt+";
-      if (event.shiftKey) shortcutString += "Shift+";
-      if (event.metaKey) shortcutString += "Meta+";
-      shortcutString += key.toUpperCase();
-
-      const conflictCheck = this._mainModule._shortcutRegistry.checkConflicts(
-        shortcutString,
-        commandKey
-      );
+      const shortcutString = eventToShortcutSignature(event);
+      const conflictCheck = checkShortcutConflicts(shortcutString, commandKey);
 
       targetInput.value = shortcutString;
 
@@ -3111,284 +3317,6 @@
     },
   };
 
-  /**
-   * Creates a unique signature for a keyboard shortcut.
-   * @param {KeyboardEvent} event - The keyboard event.
-   * @returns {string} A unique signature string.
-   */
-  function eventToShortcutSignature(event) {
-    const modifiers = [];
-    if (event.ctrlKey || event.metaKey) modifiers.push("ctrl");
-    if (event.altKey) modifiers.push("alt");
-    if (event.shiftKey) modifiers.push("shift");
-    modifiers.push(event.key.toLowerCase());
-    return modifiers.join("+");
-  }
-
-  /**
-   * Creates a unique signature for a shortcut string.
-   * @param {string} shortcutStr - The shortcut string (e.g., "Ctrl+K").
-   * @returns {string} A unique signature string.
-   */
-  function shortcutStringToSignature(shortcutStr) {
-    if (!shortcutStr) return "";
-    return shortcutStr
-      .toLowerCase()
-      .replace(/control/g, "ctrl")
-      .replace(/option/g, "alt");
-  }
-
-  /**
-   * Parses a shortcut string into a normalized object.
-   * @param {string} shortcutStr - The shortcut string (e.g., "Ctrl+Shift+K").
-   * @returns {{key: string, ctrl: boolean, alt: boolean, shift: boolean, meta: boolean}}
-   */
-  function parseStringToShortcut(shortcutStr) {
-    const parts = shortcutStr
-      .toLowerCase()
-      .split("+")
-      .map((p) => p.trim());
-    const keyPart = parts.pop();
-
-    return {
-      key: keyPart?.toLowerCase() || "",
-      ctrl: parts.includes("ctrl") || parts.includes("control"),
-      alt: parts.includes("alt"),
-      shift: parts.includes("shift"),
-      meta: parts.includes("meta") || parts.includes("cmd") || parts.includes("win"),
-    };
-  }
-
-  /**
-   * Checks if two shortcuts are equal (platform-aware).
-   * @param {{key: string, ctrl: boolean, alt: boolean, shift: boolean, meta: boolean}} shortcut1
-   * @param {{key: string, ctrl: boolean, alt: boolean, shift: boolean, meta: boolean}} shortcut2
-   * @returns {boolean}
-   */
-  function shortcutsEqual(shortcut1, shortcut2) {
-    const isMacOS = navigator.platform.indexOf("Mac") === 0;
-
-    if (shortcut1.key !== shortcut2.key) {
-      return false;
-    }
-
-    if (shortcut1.alt !== shortcut2.alt || shortcut1.shift !== shortcut2.shift) {
-      return false;
-    }
-
-    if (isMacOS) {
-      const ctrl1 = shortcut1.ctrl || shortcut1.meta;
-      const ctrl2 = shortcut2.ctrl || shortcut2.meta;
-      return ctrl1 === ctrl2;
-    } else {
-      const ctrl1 = shortcut1.ctrl || shortcut1.meta;
-      const ctrl2 = shortcut2.ctrl || shortcut2.meta;
-      return ctrl1 === ctrl2 && shortcut1.meta === shortcut2.meta;
-    }
-  }
-
-  /**
-   * A registry for managing keyboard shortcuts using event listeners.
-   */
-  class ShortcutRegistry {
-    constructor() {
-      this._shortcuts = new Map();
-      this._boundHandler = this._handleKeyDown.bind(this);
-    }
-
-    /**
-     * Initializes the registry and starts listening for keyboard events.
-     * @param {EventTarget} [target=window] - The event target to attach listeners to.
-     */
-    init(target = window) {
-      this._target = target;
-      this._target.addEventListener("keydown", this._boundHandler, true);
-    }
-
-    /**
-     * Destroys the registry and removes all event listeners.
-     */
-    destroy() {
-      if (this._target) {
-        this._target.removeEventListener("keydown", this._boundHandler, true);
-      }
-      this._shortcuts.clear();
-    }
-
-    /**
-     * Handles keydown events and executes matching shortcuts.
-     * @param {KeyboardEvent} event - The keyboard event.
-     */
-    _handleKeyDown(event) {
-      const signature = eventToShortcutSignature(event);
-      const shortcut = this._shortcuts.get(signature);
-
-      if (shortcut) {
-        event.preventDefault();
-        event.stopPropagation();
-        shortcut.callback(event);
-      }
-    }
-
-    /**
-     * Checks for conflicts with Zen's native shortcuts.
-     * @param {string} shortcutStr - The shortcut string to check.
-     * @param {string} excludeId - The ID to exclude from conflict check (usually the current shortcut's ID).
-     * @returns {{hasConflict: boolean, conflictInfo?: {shortcut: string, id: string}}}
-     */
-    _checkZenConflict(shortcutStr, excludeId = null) {
-      if (
-        !window.gZenKeyboardShortcutsManager ||
-        !window.gZenKeyboardShortcutsManager._currentShortcutList
-      ) {
-        return { hasConflict: false };
-      }
-
-      const parsed = parseStringToShortcut(shortcutStr);
-
-      for (const shortcut of window.gZenKeyboardShortcutsManager._currentShortcutList) {
-        if (shortcut.getID() === excludeId) {
-          continue;
-        }
-
-        const zenShortcut = {
-          key: shortcut.getKeyName()?.toLowerCase() || "",
-          ctrl: shortcut.getModifiers().control || shortcut.getModifiers().accel,
-          alt: shortcut.getModifiers().alt,
-          shift: shortcut.getModifiers().shift,
-          meta: shortcut.getModifiers().meta,
-        };
-
-        if (shortcutsEqual(parsed, zenShortcut)) {
-          return {
-            hasConflict: true,
-            conflictInfo: {
-              shortcut: shortcut.toDisplayString(),
-              id: shortcut.getID(),
-            },
-          };
-        }
-      }
-
-      return { hasConflict: false };
-    }
-
-    /**
-     * Registers a new keyboard shortcut.
-     * @param {string} shortcutStr - The shortcut string (e.g., "Ctrl+Shift+K").
-     * @param {string} id - A unique identifier for this shortcut.
-     * @param {Function} callback - The function to execute when the shortcut is triggered.
-     * @returns {boolean} True if registration was successful, false otherwise.
-     */
-    register(shortcutStr, id, callback) {
-      if (!shortcutStr || !id || typeof callback !== "function") {
-        console.error("ShortcutRegistry.register: Invalid arguments", { shortcutStr, id, callback });
-        return false;
-      }
-
-      const signature = shortcutStringToSignature(shortcutStr);
-      this._shortcuts.set(signature, { id, callback, shortcutStr });
-      return true;
-    }
-
-    /**
-     * Unregisters a keyboard shortcut by its ID or shortcut string.
-     * @param {string} identifier - The ID or shortcut string of the shortcut to unregister.
-     * @returns {boolean} True if unregistration was successful, false otherwise.
-     */
-    unregister(identifier) {
-      const signature = shortcutStringToSignature(identifier);
-      const shortcut = this._shortcuts.get(signature);
-
-      if (!shortcut) {
-        return false;
-      }
-
-      this._shortcuts.delete(signature);
-      return true;
-    }
-
-    /**
-     * Unregisters a shortcut by its ID.
-     * @param {string} id - The ID of the shortcut to unregister.
-     * @returns {boolean} True if unregistration was successful, false otherwise.
-     */
-    unregisterById(id) {
-      for (const [signature, shortcut] of this._shortcuts.entries()) {
-        if (shortcut.id === id) {
-          this._shortcuts.delete(signature);
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Checks if a shortcut is registered.
-     * @param {string} shortcutStr - The shortcut string to check.
-     * @returns {boolean} True if the shortcut is registered, false otherwise.
-     */
-    isRegistered(shortcutStr) {
-      const signature = shortcutStringToSignature(shortcutStr);
-      return this._shortcuts.has(signature);
-    }
-
-    /**
-     * Gets the ID of the shortcut registered for a given shortcut string.
-     * @param {string} shortcutStr - The shortcut string.
-     * @returns {string|null} The ID of the registered shortcut, or null if not found.
-     */
-    getRegistrationId(shortcutStr) {
-      const signature = shortcutStringToSignature(shortcutStr);
-      const shortcut = this._shortcuts.get(signature);
-      return shortcut ? shortcut.id : null;
-    }
-
-    /**
-     * Checks for conflicts with a given shortcut string.
-     * @param {string} shortcutStr - The shortcut string to check.
-     * @param {string} [excludeId] - An ID to exclude from conflict checking.
-     * @returns {{hasConflict: boolean, conflicts: Array<{shortcut: string, id: string}>}}
-     */
-    checkConflicts(shortcutStr, excludeId = null) {
-      const conflicts = [];
-
-      const existingShortcut = this._shortcuts.get(shortcutStringToSignature(shortcutStr));
-      if (existingShortcut && existingShortcut.id !== excludeId) {
-        conflicts.push({ shortcut: shortcutStr, id: existingShortcut.id, source: "custom" });
-      }
-
-      const zenConflict = this._checkZenConflict(shortcutStr, excludeId);
-      if (zenConflict.hasConflict) {
-        conflicts.push({ ...zenConflict.conflictInfo, source: "zen" });
-      }
-
-      return {
-        hasConflict: conflicts.length > 0,
-        conflicts,
-      };
-    }
-
-    /**
-     * Gets all registered shortcuts.
-     * @returns {Array<{id: string, shortcutStr: string, signature: string}>} An array of all registered shortcuts.
-     */
-    getAllShortcuts() {
-      return Array.from(this._shortcuts.entries()).map(([signature, shortcut]) => ({
-        id: shortcut.id,
-        shortcutStr: shortcut.shortcutStr,
-        signature,
-      }));
-    }
-
-    /**
-     * Clears all registered shortcuts.
-     */
-    clear() {
-      this._shortcuts.clear();
-    }
-  }
-
   function startupFinish(callback) {
     if (document.readyState === "complete") callback();
     else window.addEventListener("load", callback, { once: true });
@@ -3467,13 +3395,12 @@
 
   function openUrl(timeout = 0) {
     setTimeout(() => {
-      PREFS.debugLog("opening URL bar");
-      doCommand("Browser:OpenLocation");
+      gURLBar.startQuery();
+      gURLBar.focus();
     }, timeout);
   }
 
   const ZenCommandPalette = {
-    _shortcutRegistry: new ShortcutRegistry(),
     /**
      * An array of dynamic command providers. Each provider is an object
      * containing a function to generate commands and an optional preference for enabling/disabling.
@@ -3877,28 +3804,37 @@
     },
 
     /**
-     * Finds a command by its key and executes it.
-     * @param {string} key - The key of the command to execute.
+     * Finds and executes a command by its key or executes a command object directly.
+     * @param {string|object} cmd - The command key or command object to execute.
      */
-    async executeCommandByKey(key) {
-      if (!key) return;
+    async executeCommand(cmd) {
+      if (!cmd) return;
 
       let cmdToExecute;
-      const nativeAction = this._globalActions?.find((a) => a.commandId === key);
+      let isCmdObject = typeof cmd === "object" && cmd !== null;
 
-      const findInCommands = (arr) => arr?.find((c) => c.key === key);
-      if (nativeAction) {
-        cmdToExecute = { key: nativeAction.commandId, command: nativeAction.command };
+      // If cmd is already a command object, use it directly
+      if (isCmdObject) {
+        cmdToExecute = cmd;
       } else {
-        cmdToExecute = findInCommands(commands);
-      }
-      if (!cmdToExecute) {
-        const dynamicCommands = await this.generateDynamicCommands(false, false);
-        cmdToExecute = findInCommands(dynamicCommands);
+        // cmd is a key, find the command by key
+        const nativeAction = this._globalActions?.find((a) => a.commandId === cmd);
+        const findInCommands = (arr) => arr?.find((c) => c.key === cmd);
+
+        if (nativeAction) {
+          cmdToExecute = { key: nativeAction.commandId, command: nativeAction.command };
+        } else {
+          cmdToExecute = findInCommands(commands);
+        }
+        if (!cmdToExecute) {
+          const dynamicCommands = await this.generateDynamicCommands(false, false);
+          cmdToExecute = findInCommands(dynamicCommands);
+        }
       }
 
       if (cmdToExecute) {
-        PREFS.debugLog("Executing command via key:", key);
+        const key = cmdToExecute.key || (isCmdObject ? "direct-command" : cmd);
+        PREFS.debugLog("Executing command:", key);
         this.addRecentCommand(cmdToExecute);
         let openUrlBar = cmdToExecute.openUrl;
         if (typeof cmdToExecute.command === "function") {
@@ -3913,6 +3849,7 @@
           }
         }
       } else {
+        const key = isCmdObject ? "command object" : cmd;
         PREFS.debugError(`executeCommandByKey: Command with key "${key}" could not be found.`);
       }
     },
@@ -3943,7 +3880,7 @@
           tooltiptext: cmd.label,
           class: "toolbarbutton-1 chromeclass-toolbar-additional zen-command-widget",
           icon: cmd.icon || "chrome://browser/skin/trending.svg",
-          onClick: () => this.executeCommandByKey(key),
+          onClick: () => this.executeCommand(key),
         });
         PREFS.debugLog(`Successfully created widget "${widgetId}" for command: ${key}`);
       } catch (e) {
@@ -3972,8 +3909,8 @@
       }
 
       const shortcutId = `zen-cmd-palette-shortcut-for-${commandKey}`;
-      const success = this._shortcutRegistry.register(shortcutStr, shortcutId, () =>
-        this.executeCommandByKey(commandKey)
+      const success = registerShortcut(shortcutStr, shortcutId, () =>
+        this.executeCommand(commandKey)
       );
 
       if (success) {
@@ -3988,7 +3925,7 @@
 
     removeHotkey(commandKey) {
       const shortcutId = `zen-cmd-palette-shortcut-for-${commandKey}`;
-      const success = this._shortcutRegistry.unregisterById(shortcutId);
+      const success = unregisterShortcutById(shortcutId);
       if (success) {
         PREFS.debugLog(`Successfully unregistered shortcut for command "${commandKey}"`);
       }
@@ -4131,10 +4068,7 @@
     },
 
     destroy() {
-      if (this._shortcutRegistry) {
-        this._shortcutRegistry.destroy();
-        PREFS.debugLog("Shortcut registry destroyed.");
-      }
+      destroyShortcutRegistry();
       if (this.provider) {
         const { UrlbarProvidersManager } = ChromeUtils.importESModule(
           "moz-src:///browser/components/urlbar/UrlbarProvidersManager.sys.mjs"
@@ -4176,7 +4110,7 @@
       this.applyUserConfig();
       PREFS.debugLog("User config loaded and applied.");
 
-      this._shortcutRegistry.init();
+      initShortcutRegistry();
       PREFS.debugLog("Shortcut registry initialized.");
 
       this.attachUrlbarCloseListeners();
@@ -4379,9 +4313,10 @@
             const cmd = details.result._zenCmd;
             if (cmd) {
               PREFS.debugLog("Executing command from onEngagement:", cmd.key);
-              self._closeUrlBar();
+              if (cmd.openUrl) gURLBar.value = "";
+              else self._closeUrlBar();
               self.addRecentCommand(cmd);
-              setTimeout(() => self.executeCommandByKey(cmd.key), 0);
+              setTimeout(() => self.executeCommand(cmd.key), 0);
             }
           }
 
