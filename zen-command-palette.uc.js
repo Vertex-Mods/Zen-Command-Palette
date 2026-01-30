@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.7
-// @lastUpdated     2026-01-29
+// @version         1.8.8
+// @lastUpdated     2026-01-30
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -1995,6 +1995,33 @@
     return modifiers.join("+");
   }
 
+  /**
+   * Creates a pretty name for shortcut
+   * @param {shortcutStr} string - shortcut string.
+   * @returns {string} Pretty name.
+   */
+  function getPrettyShortcut(shortcutStr) {
+    if (!shortcutStr) return "";
+    const pretty = shortcutStr
+      .toLowerCase()
+      .replace(/control/g, "⌘")
+      .replace(/accel/g, "⌘")
+      .replace(/ctrl/g, "⌘")
+      .replace(/shift/g, "⇧")
+      .replace(/option/g, "Alt")
+      .replace(/alt/g, "Alt")
+      .replace(/space/g, "␣")
+      .replace(/spacebar/g, "␣")
+      .replace(/enter/g, "↩")
+      .replace(/arrowright/g, "→")
+      .replace(/arrowleft/g, "←")
+      .replace(/arrowup/g, "↑")
+      .replace(/arrowdown/g, "↓");
+
+    // Capatalize first letter
+    return pretty ? pretty[0].toUpperCase() + pretty.slice(1) : "";
+  }
+
   function normalizeKeyName(key) {
     if (!key) return "";
     const k = key.toLowerCase();
@@ -2379,10 +2406,11 @@
       if (oldShortcutsJSON !== newShortcutsJSON) {
         const oldShortcuts = oldSettings.customShortcuts || {};
         const newShortcuts = newSettings.customShortcuts || {};
+        const defautlShortcut = this._mainModule._getDefaultShortcuts();
 
         // Remove old shortcuts
         for (const [commandKey] of Object.entries(oldShortcuts)) {
-          if (!newShortcuts[commandKey]) {
+          if (!newShortcuts[commandKey] && oldShortcuts[commandKey] !== defautlShortcut[commandKey]) {
             this._mainModule.removeHotkey(commandKey);
           }
         }
@@ -2507,9 +2535,10 @@
       const allowToolbarButton = cmd.allowShortcuts !== false;
 
       const shortcutValue = customShortcut || nativeShortcut || "";
+      const prettyShortcut = shortcutValue ? getPrettyShortcut(shortcutValue) : "";
       const shortcutInputHtml = `<div class="shortcut-input-wrapper">
       <input type="text" class="shortcut-input" placeholder="Set Shortcut" value="${escapeXmlAttribute(
-        shortcutValue
+        prettyShortcut
       )}" ${!allowShortcutChange ? "readonly" : ""} />
       <span class="shortcut-conflict-warning" hidden title="Shortcut conflict"></span>
     </div>`;
@@ -2659,7 +2688,7 @@
       const shortcutString = eventToShortcutSignature(event);
       const conflictCheck = checkShortcutConflicts(shortcutString, commandKey);
 
-      targetInput.value = shortcutString;
+      targetInput.value = getPrettyShortcut(shortcutString);
 
       if (conflictCheck.hasConflict) {
         targetInput.classList.add("conflict");
@@ -3940,7 +3969,7 @@
     getShortcutForCommand(commandKey) {
       // First, check for user-defined custom shortcuts
       if (this._userConfig.customShortcuts?.[commandKey]) {
-        return this._userConfig.customShortcuts[commandKey];
+        return getPrettyShortcut(this._userConfig.customShortcuts[commandKey]);
       }
 
       // Then, check Zen's native shortcut manager
@@ -3954,7 +3983,12 @@
       const shortcut = window.gZenKeyboardShortcutsManager._currentShortcutList.find(
         (s) => (s.getAction() === commandKey || s.getID() === commandKey) && !s.isEmpty()
       );
-      return shortcut ? shortcut.toDisplayString() : null;
+      if (shortcut) return shortcut.toDisplayString();
+
+      // Nothing found fallback to default
+      const defaultShortcuts = this._getDefaultShortcuts();
+      const df = defaultShortcuts[commandKey];
+      if (df) return getPrettyShortcut(df);
     },
 
     attachUrlbarCloseListeners() {
