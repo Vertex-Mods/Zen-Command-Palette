@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.9
-// @lastUpdated     2026-02-01
+// @version         1.8.91
+// @lastUpdated     2026-02-03
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -1457,15 +1457,16 @@
         key: `search:${engineName}`,
         label: `Search with: ${engineName}`,
         command: () => {
-          if (window.gURLBar) {
+          const browserWindow = Services.wm.getMostRecentWindow("navigator:browser");
+          const gURLBar = browserWindow.gURLBar;
+          if (gURLBar) {
             // Clear the command text from the urlbar before changing mode. This is the key fix.
-            window.gURLBar.value = "";
-            window.gURLBar.searchMode = {
+            gURLBar.value = "";
+            gURLBar.searchMode = {
               engineName,
-              // "oneoff" is the entry type used by urlbar one-off buttons.
               entry: "oneoff",
             };
-            window.gURLBar.focus();
+            gURLBar.focus();
           }
         },
         condition: () => {
@@ -3431,6 +3432,8 @@
   }
 
   function openUrl(timeout = 0) {
+    const browserWindow = Services.wm.getMostRecentWindow("navigator:browser");
+    const gURLBar = browserWindow.gURLBar;
     setTimeout(() => {
       gURLBar.startQuery();
       gURLBar.focus();
@@ -3526,7 +3529,6 @@
     MAX_RECENT_COMMANDS: 20,
     _dynamicCommandsCache: null,
     _userConfig: {},
-    _closeListenersAttached: false,
     _globalActions: null,
 
     safeStr(x) {
@@ -3539,6 +3541,8 @@
 
     _closeUrlBar() {
       try {
+        const browserWindow = Services.wm.getMostRecentWindow("navigator:browser");
+        const gURLBar = browserWindow.gURLBar;
         gURLBar.value = "";
         if (window.gZenUIManager && typeof window.gZenUIManager.handleUrlbarClose === "function") {
           window.gZenUIManager.handleUrlbarClose(false, false);
@@ -4001,20 +4005,22 @@
       if (df) return getPrettyShortcut(df);
     },
 
-    attachUrlbarCloseListeners() {
-      if (this._closeListenersAttached) {
-        return;
-      }
-
+    attachUrlbarListeners() {
       const onUrlbarClose = () => {
-        const isPrefixModeActive = this.provider?._isInPrefixMode ?? false;
         if (this.provider) this.provider.dispose();
-        if (isPrefixModeActive) gURLBar.value = "";
       };
+
+      gURLBar.inputField.addEventListener("keydown", (event) => {
+        if (this.provider?._isInPrefixMode) {
+          if (event.key === "Backspace" && gURLBar.selectionStart === 0) {
+            event.preventDefault();
+            this.provider.dispose(true);
+          }
+        }
+      });
 
       gURLBar.inputField.addEventListener("blur", onUrlbarClose);
       gURLBar.view.panel.addEventListener("popuphiding", onUrlbarClose);
-      this._closeListenersAttached = true;
       PREFS.debugLog("URL bar close listeners attached.");
     },
 
@@ -4158,18 +4164,7 @@
       initShortcutRegistry();
       PREFS.debugLog("Shortcut registry initialized.");
 
-      this.attachUrlbarCloseListeners();
-
-      gURLBar.inputField.addEventListener("keydown", (event) => {
-        if (this.provider?._isInPrefixMode && gURLBar.value === "") {
-          if (event.key === "Backspace" || event.key === "Escape") {
-            event.preventDefault();
-            this._exitPrefixMode();
-          }
-        }
-      });
-
-      window.addEventListener("unload", () => this.destroy(), { once: true });
+      this.attachUrlbarListeners();
 
       const { UrlbarUtils, UrlbarProvider } = ChromeUtils.importESModule(
         "moz-src:///browser/components/urlbar/UrlbarUtils.sys.mjs"
@@ -4251,6 +4246,8 @@
 
               if (isEnteringPrefixMode) {
                 this._isInPrefixMode = true;
+                const browserWindow = Services.wm.getMostRecentWindow("navigator:browser");
+                const gURLBar = browserWindow.gURLBar;
                 gURLBar.setAttribute("zen-cmd-palette-prefix-mode", "true");
                 query = input.substring(PREFS.prefix.length).trim();
                 gURLBar.value = query;
@@ -4345,9 +4342,15 @@
             }
           }
 
-          dispose() {
+          dispose(preserveValue = false) {
             PREFS.resetTempMaxRichResults();
+            const browserWindow = Services.wm.getMostRecentWindow("navigator:browser");
+            const gURLBar = browserWindow.gURLBar;
             gURLBar.removeAttribute("zen-cmd-palette-prefix-mode");
+            if (this._isInPrefixMode) {
+              if (!preserveValue) gURLBar.value = "";
+              gURLBar.startQuery();
+            }
             this._isInPrefixMode = false;
             setTimeout(() => {
               self.clearDynamicCommandsCache();
@@ -4358,6 +4361,8 @@
             const cmd = details.result._zenCmd;
             if (cmd) {
               PREFS.debugLog("Executing command from onEngagement:", cmd.key);
+              const browserWindow = Services.wm.getMostRecentWindow("navigator:browser");
+              const gURLBar = browserWindow.gURLBar;
               if (cmd.openUrl) gURLBar.value = "";
               else self._closeUrlBar();
               self.addRecentCommand(cmd);
@@ -4390,9 +4395,16 @@
           }
         }
 
-        this.provider = new ZenCommandProvider();
-        UrlbarProvidersManager.registerProvider(this.provider);
-        PREFS.debugLog("Zen Command Palette provider registered.");
+        // Check if a provider with the same name is already registered
+        const existingProvider = UrlbarProvidersManager.getProvider("TestProvider");
+        if (existingProvider) {
+          this.provider = existingProvider;
+          PREFS.debugLog("Using existing shared provider instance.");
+        } else {
+          this.provider = new ZenCommandProvider();
+          UrlbarProvidersManager.registerProvider(this.provider);
+          PREFS.debugLog("Zen Command Palette provider registered.");
+        }
       } catch (e) {
         PREFS.debugError("Failed to create/register Urlbar provider:", e);
       }
