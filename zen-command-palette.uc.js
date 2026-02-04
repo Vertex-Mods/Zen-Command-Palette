@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.91
-// @lastUpdated     2026-02-03
+// @version         1.8.92
+// @lastUpdated     2026-02-04
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -2153,6 +2153,12 @@
    * @param {KeyboardEvent} event - The keyboard event.
    */
   function handleKeyDown(event) {
+    // Don't save if input is in focus
+    const t = event.target;
+    if (t && (t.tagName === "input" || t.tagName === "textarea" || t.isContentEditable)) {
+      return;
+    }
+
     const signature = eventToShortcutSignature(event);
     const shortcut = _shortcuts.get(signature);
 
@@ -2347,8 +2353,8 @@
       for (const [commandKey, shortcut] of Object.entries(
         this._currentSettings.customShortcuts || {}
       )) {
-        // Only save if: shortcut is not a default shortcut
-        if (shortcut && defaultShortcuts[commandKey] !== shortcut) {
+        // Only save if default shortcut is changed/removed
+        if (shortcut !== undefined && defaultShortcuts[commandKey] !== shortcut) {
           filteredCustomShortcuts[commandKey] = shortcut;
         }
       }
@@ -2419,7 +2425,10 @@
 
         // Remove old shortcuts
         for (const [commandKey] of Object.entries(oldShortcuts)) {
-          if (!newShortcuts[commandKey] && oldShortcuts[commandKey] !== defautlShortcut[commandKey]) {
+          if (
+            (!newShortcuts[commandKey] && oldShortcuts[commandKey] !== defautlShortcut[commandKey]) ||
+            newShortcuts[commandKey] === ""
+          ) {
             this._mainModule.removeHotkey(commandKey);
           }
         }
@@ -2676,7 +2685,8 @@
       if (key === "Backspace" || key === "Delete") {
         targetInput.value = "";
         if (commandKey) {
-          delete this._currentSettings.customShortcuts[commandKey];
+          // Set to empty string to indicate "unbound" instead of deleting
+          this._currentSettings.customShortcuts[commandKey] = "";
         }
         clearConflict();
         window.removeEventListener("keydown", this._boundHandleShortcutKeyDown, true);
@@ -2715,7 +2725,7 @@
           `Shortcut conflict detected for "${commandKey}" with shortcut "${shortcutString}":`,
           conflictCheck.conflicts
         );
-        delete this._currentSettings.customShortcuts[commandKey];
+        this._currentSettings.customShortcuts[commandKey] = shortcutString;
       } else {
         clearConflict();
         this._currentSettings.customShortcuts[commandKey] = shortcutString;
@@ -3340,13 +3350,13 @@
             </div>
             <div id="settings-tab-content" class="cmd-settings-tab-content" hidden>
               <!-- Content will be populated by _populateSettingsTab -->
-            </div>
+              </div>
             <div id="custom-commands-tab-content" class="cmd-settings-tab-content" hidden>
               <!-- Content will be populated by _populateCustomCommandsTab -->
-            </div>
+              </div>
             <div id="help-tab-content" class="cmd-settings-tab-content" hidden>
               <!-- Content will be populated by _populateHelpTab -->
-            </div>
+              </div>
           </div>
         </div>
       </div>
@@ -3982,8 +3992,11 @@
      */
     getShortcutForCommand(commandKey) {
       // First, check for user-defined custom shortcuts
-      if (this._userConfig.customShortcuts?.[commandKey]) {
-        return getPrettyShortcut(this._userConfig.customShortcuts[commandKey]);
+      const userShortcut = this._userConfig.customShortcuts?.[commandKey];
+      if (userShortcut !== undefined) {
+        if (userShortcut) return getPrettyShortcut(userShortcut);
+        // shortcut is empty string ""
+        else return;
       }
 
       // Then, check Zen's native shortcut manager
@@ -4092,7 +4105,7 @@
       const customShortcuts = this._userConfig.customShortcuts || {};
 
       for (const [commandKey, shortcutStr] of Object.entries(defaultShortcuts)) {
-        if (!customShortcuts[commandKey]) customShortcuts[commandKey] = shortcutStr;
+        if (customShortcuts[commandKey] === undefined) customShortcuts[commandKey] = shortcutStr;
       }
 
       let appliedCount = 0;
