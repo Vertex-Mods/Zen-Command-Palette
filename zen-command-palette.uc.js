@@ -2,7 +2,7 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.93b
+// @version         1.8.94b
 // @lastUpdated     2026-04-01
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
@@ -2921,8 +2921,8 @@
     },
     destroy() {
       if (destroyShortcutRegistry(), this.provider) {
-        let { UrlbarProvidersManager } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarProvidersManager.sys.mjs");
-        UrlbarProvidersManager.unregisterProvider(this.provider), this.provider = null, PREFS2.debugLog("Urlbar provider unregistered.");
+        let { ProvidersManager } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarProvidersManager.sys.mjs");
+        ProvidersManager.getInstanceForSap("urlbar").unregisterProvider(this.provider), this.provider = null, PREFS2.debugLog("Urlbar provider unregistered.");
       }
     },
     _exitPrefixMode() {
@@ -2938,7 +2938,14 @@
         PREFS2.debugError("Could not load native globalActions, native commands will be unavailable.", e);
       }
       this.Settings = SettingsModal, this.Settings.init(this), PREFS2.debugLog("Settings modal initialized."), await this.loadUserConfig(), this.applyUserConfig(), PREFS2.debugLog("User config loaded and applied."), initShortcutRegistry(), PREFS2.debugLog("Shortcut registry initialized."), this.attachUrlbarListeners();
-      let { UrlbarUtils, UrlbarProvider } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarUtils.sys.mjs"), { UrlbarProvidersManager } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarProvidersManager.sys.mjs"), { UrlbarResult } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarResult.sys.mjs");
+      let { UrlbarUtils, UrlbarProvider: UrlbarProviderFromUtils } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarUtils.sys.mjs"), UrlbarProvider = UrlbarProviderFromUtils;
+      if (typeof UrlbarProvider > "u")
+        try {
+          ({ UrlbarProvider } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarProvider.sys.mjs"));
+        } catch (e) {
+          PREFS2.debugError("Could not import UrlbarProvider from any known module.", e);
+        }
+      let { ProvidersManager } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarProvidersManager.sys.mjs"), UrlbarProvidersManager = ProvidersManager.getInstanceForSap("urlbar"), { UrlbarResult } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarResult.sys.mjs");
       if (typeof UrlbarResult.payloadAndSimpleHighlights !== "function")
         UrlbarResult.payloadAndSimpleHighlights = (_reusable, payloadObj) => {
           let payload = {}, payloadHighlights = {};
@@ -3023,19 +3030,18 @@
               let addResult = (cmd, isHeuristic = !1) => {
                 if (!cmd)
                   return;
-                let shortcut = self.getShortcutForCommand(cmd.key), { payload, payloadHighlights } = UrlbarResult.payloadAndSimpleHighlights([], {
-                  suggestion: cmd.label,
-                  title: cmd.label,
-                  query: input,
-                  keywords: cmd?.tags,
-                  icon: cmd.icon || "chrome://browser/skin/trending.svg",
-                  shortcutContent: shortcut,
-                  dynamicType: DYNAMIC_TYPE_NAME
-                }), result = new UrlbarResult({
+                let shortcut = self.getShortcutForCommand(cmd.key), result = new UrlbarResult({
                   type: UrlbarUtils.RESULT_TYPE.DYNAMIC,
                   source: UrlbarUtils.RESULT_SOURCE.OTHER_LOCAL,
-                  payload,
-                  payloadHighlights
+                  payload: {
+                    suggestion: cmd.label,
+                    title: cmd.label,
+                    query: input,
+                    keywords: cmd?.tags,
+                    icon: cmd.icon || "chrome://browser/skin/trending.svg",
+                    shortcutContent: shortcut,
+                    dynamicType: DYNAMIC_TYPE_NAME
+                  }
                 });
                 if (isHeuristic)
                   result.heuristic = !0;
