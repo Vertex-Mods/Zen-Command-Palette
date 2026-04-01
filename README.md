@@ -29,25 +29,28 @@ https://github.com/user-attachments/assets/999167fa-aa3e-417c-94b5-e40c12e1897e
 4. Search for Zen Command Palette.
 5. Click Install.
 6. A toast for restart should appear — click on that to restart Zen.
-7. Feel productive !
+7. Feel productive!
+
+> [!NOTE]
+> If you want to try Early Beta version you can use the beta branch `https://github.com/Vertex-Mods/Zen-Command-Palette/tree/beta`
 
 ## 🎨 Customization & Preferences
 
-The Zen Command Palette can be configured via its own settings. Simply type `: Command palette configure` in the command palette and you will see commands like `Command Palette: Configure Settings` run the command which will open settings Popup. Which will allow adding more commands and configuration like keyboard shortcut, icon, hiding commands, creating toolbar icon.
+The Zen Command Palette can be configured via its own settings. Simply press `Ctrl + ,` and you will see command settings popup. Which will allow adding more commands and configuration like keyboard shortcut, icon, hiding commands, creating toolbar icon.
 
-### Creating Toolbar icons
+### Creating Toolbar Icons
 
 https://github.com/user-attachments/assets/bdd87f58-f6f7-480c-8ffe-1150d571f482
 
 > [!Note]
-> In current version it don't need restart to get the toolbar icon.
+> In current version it doesn't need to restart to get the toolbar icon.
 
-### Making custom commands
+### Making Custom Commands
 
 https://github.com/user-attachments/assets/71dae23a-bb0c-4a04-add6-450d344751a0
 
 > [!Note]
-> Custom commands and shortcut keys are stored in JSON file here is [this](../zen-commands-settings.json) is my custom commands and shortcut keys.
+> Custom commands and shortcut keys are stored in JSON file here is [this](https://github.com/bibekbhusal0/zen-custom-js/blob/main/zen-commands-settings.json) is my custom commands and shortcut keys.
 
 > [!Note]
 > You can press delete/blackspace to remove the shortcut key. Changing shortcut key from menu this will not replace/remove existing shortcut keys they have to be done from Zen Settings.
@@ -57,7 +60,7 @@ Here are all Preferences which can be configured from `about:config` (also from 
 | Preference Key                                         | Type    | Default                             | Description                                                                  |
 | ------------------------------------------------------ | ------- | ----------------------------------- | ---------------------------------------------------------------------------- |
 | `zen-command-palette.prefix`                           | string  | `:`                                 | Prefix after entering which commands will appear                             |
-| `zen-command-palette.prefix-required`                  | Boolean | `false`                             | If `true`, commands only appear when the query starts with Preifx.           |
+| `zen-command-palette.prefix-required`                  | Boolean | `false`                             | If `true`, commands only appear when the query starts with Prefix.           |
 | `zen-command-palette.debug-mode`                       | Boolean | `false`                             | Enables detailed logging in the Browser Console for troubleshooting.         |
 | `zen-command-palette.max-commands`                     | Integer | `3`                                 | The maximum number of command results to display at once (without prefix).   |
 | `zen-command-palette.max-commands-prefix`              | Integer | `50`                                | The maximum number of command results to display with the prefix.            |
@@ -70,11 +73,21 @@ Here are all Preferences which can be configured from `about:config` (also from 
 | `zen-command-palette.dynamic.extension-enable-disable` | Boolean | `false`                             | Automatically generate commands for enabling/disabling extensions.           |
 | `zen-command-palette.dynamic.workspaces`               | Boolean | `true`                              | Automatically generate commands for switching/moving tabs to Workspaces.     |
 | `zen-command-palette.dynamic.folders`                  | Boolean | `true`                              | Automatically generate commands for managing Folders.                        |
-| `zen-command-palette.dynamic.sine-mods`                | Boolean | `true`                              | Automatically generate commands for uninstalling sine mods.                  |
+| `zen-command-palette.dynamic.sine-mods`                | Boolean | `true`                              | Automatically generate commands for installing/uninstalling sine mods.       |
 | `zen-command-palette.dynamic.container-tabs`           | Boolean | `false`                             | Automatically generate commands for moving tabs between containers.          |
 | `zen-command-palette.dynamic.active-tabs`              | Boolean | `false`                             | Automatically generate commands for switching between active tabs.           |
 | `zen-command-palette.dynamic.unload-tab`               | Boolean | `false`                             | Automatically generate commands for unloading active tabs.                   |
 | `zen-command-palette.settings-file-path`               | String  | `chrome/zen-commands-settings.json` | Path to the file storing user customizations (hidden commands, icons, etc.). |
+
+## ⌨️ Default Keyboard Shortcuts
+
+The command palette includes default keyboard shortcuts that can be overridden by user custom shortcuts. Default shortcuts are applied only when no custom shortcut exists for that command.
+
+| Command                    | Default Shortcut | Description                                                |
+| -------------------------- | ---------------- | ---------------------------------------------------------- |
+| Open Command Palette       | `Ctrl+Shift+P`   | Opens the command palette to search all available commands |
+| Command Configure Commands | `Ctrl+,`         | Opens Command palette Settings to Customize commands       |
+| Repeat Last Command        | `Ctrl+.`         | Repeat Last command run from command palette.              |
 
 ## 📋 Available Commands
 
@@ -106,9 +119,9 @@ The following commands are now native:
   - Toggle Toolbar
 - **Workspaces**:
   - Create New Workspace
-  - Change Workspace Name
   - Change Workspace Icon
   - Delete Workspace
+  - Change Workspace Name
   - Reorder Workspaces
 - **Split View**:
   - Unsplit View
@@ -125,6 +138,7 @@ The following commands are now native:
   - Toggle Sidebar Width
   - Copy Current URL as Markdown
   - Toggle Single toolbar mode
+  - Toggle Collapse Pinned Tabs
 
 ### Tab Management
 
@@ -136,11 +150,14 @@ The following commands are now native:
 - Move Tab to New Window
 - Toggle Mute Tab
 - Show All Tabs Panel
+- Change Tab Icon
+- Clear Other Tabs
 - Reopen Closed Tab
 - Unload Tab
 - Unload other tabs
 - Replace Pinned Tab URL with Current
 - Reset Pinned Tab
+- Toggle Collapsed Pins
 
 ### Window Management
 
@@ -173,7 +190,7 @@ The following commands are now native:
 
 ### View & Display
 
-- Toggle Fullscreen
+- Toggle Full screen
 - Toggle Reader Mode
 - Zoom In
 - Zoom Out
@@ -210,14 +227,15 @@ The following commands are now native:
 
 ### Command Palette
 
-- Command Palette: Configure Commands
+- Search Commands (`Ctrl+Shift+P`)
+- Command Palette: Configure Commands (`Ctrl+,`)
 - Command Palette: Preferences
 - Command Palette: Help
 - Command Palette: Custom Commands
+- Command Palette: Repeat Last Command (`Ctrl+.`)
 
 ### Tidy Tabs
 
-- Clear Other Tabs
 - Sort Tabs
 
 ### Advanced Tab Groups
@@ -228,15 +246,15 @@ The following commands are now native:
 ### Dynamic Commands
 
 - **About Pages**: `Open about:[page-name]` (e.g., "Open about:config").
-- **Search Engines**: `Search with: [Engine Name]` to change the default search engine for the next search.
-- **Extension Options**: `Extension Options: [Addon Name]` to open the options page for an extension.
-- **Container Tabs**: `Open Tab in: [Container Name]` to move the current tab to a different container.
+- **Search Engines**: `Search with: [Engine Name]` to use a specific search engine.
+- **Extensions**: `Enable/Disable/Uninstall Extension: [Name]`.
+- **Container Tabs**: `Open Tab in: [Container Name]` to open current tab to a different container.
 - **Active Tabs**: `Switch to Tab: [Tab Title]` to quickly switch to any open tab, even across workspaces.
 - **Unload Tabs**: `Unload Tab: [Tab Title]` to quickly unload tab (to save memory).
 - **Workspaces**: `Switch to workspace: [Workspace Name]` and `Move Tab to Workspace: [Workspace Name]`.
-- **Sine Mods**: `Uninstall Sine Mod: [Mod Name]`.
+- **Sine Mods**: `Uninstall Sine Mod: [Mod Name]` and `Install Sine Mod: [Mod Name]`.
 - **Folders**: `Delete Folder: [Folder Name]` and `Move Tab to Folder: [Folder Name]`.
-- **Addons**: `Enable Extension: [Addon Name]`, `Disable Extension: [Addon Name]`, and `Uninstall Extension: [Addon Name]`.
+- **Custom Commands**: User-defined custom JavaScript commands.
 
 </details>
 
@@ -244,7 +262,7 @@ The following commands are now native:
 
 Adding your own commands from other scripts is straightforward. The `ZenCommandPalette` object is exposed on the `window`, allowing you to use its API to add both static and dynamic commands. I encourage all mod creators to incorporate this into their own mods (especially ones with JS).
 
-### Other mods which support Command Palette
+### Other Mods Which Support Command Palette
 
 - [Advanced Tab Groups](https://github.com/12th-devs/Advanced-Tab-Groups)
 - [AI Tab Groups](https://github.com/Darsh-A/Ai-TabGroups-ZenBrowser/)
@@ -305,17 +323,17 @@ if (window.ZenCommandPalette) {
 
 ## ❓ FAQ
 
-I am not making up the questions. I have been asked these questions in reddit and discord muliple times.
+I am not making up the questions. I have been asked these questions in Reddit and discord multiple times.
 
 <details>
 <summary><h3>What is difference between this and native zen command bar (released recently)</h3></summary>
-Zen command bar don't contain too much commands to optimize for performance, this mod contain 100+ static commands. And on top of it, this provides API making easy for user to add more commands. Already 4 other mods (1 unreleased version) support the command palette.
+Zen command bar don't contain too much commands to optimize for performance, this mod contain 100+ static commands. And on top of it, this provides API making easy for user to add more commands. Already 4 other mods support the command palette.
 
-Another Benifit of this mod, is that this allows setting custom keymaps to commands, and allow adding them as toolbar icons.
+Another Benefit of this mod, is that this allows setting custom keymaps to commands, and allow adding them as toolbar icons.
 
 </details>
 
-## 🙏 Credits and Acknowledgements
+## 🙏 Credits and Acknowledgments
 
 This mod is released through [Vertex Mods](https://github.com/Vertex-Mods/), and I, [Bibek Bhusal](https://github.com/BibekBhusal0), am the creator of this mod.
 
