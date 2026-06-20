@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.94
-// @lastUpdated     2026-04-01
+// @version         1.8.95
+// @lastUpdated     2026-06-21
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -66,7 +66,7 @@
     debugLog("Generated toast ID:", toastId);
     try {
       debugLog("Importing uc_api module...");
-      let ucAPI = ChromeUtils.importESModule("chrome://userscripts/content/engine/utils/uc_api.sys.mjs").default;
+      let ucAPI = ChromeUtils.importESModule("chrome://userscripts/content/utils/uc_api.sys.mjs").default;
       debugLog("uc_api module imported successfully:", !!ucAPI);
       let showToastOptions = {
         id: toastId,
@@ -174,20 +174,17 @@
   }
   var getPref = (key, defaultValue) => {
     try {
-      let prefService = Services.prefs;
-      if (prefService.prefHasUserValue(key))
-        switch (prefService.getPrefType(key)) {
-          case prefService.PREF_STRING:
-            return prefService.getStringPref(key);
-          case prefService.PREF_INT:
-            return prefService.getIntPref(key);
-          case prefService.PREF_BOOL:
-            return prefService.getBoolPref(key);
-        }
+      let prefService = Services.prefs, type = prefService.getPrefType(key);
+      if (type === prefService.PREF_STRING)
+        return prefService.getStringPref(key);
+      else if (type === prefService.PREF_INT)
+        return prefService.getIntPref(key);
+      else if (type === prefService.PREF_BOOL)
+        return prefService.getBoolPref(key);
+      return defaultValue;
     } catch {
       return defaultValue;
     }
-    return defaultValue;
   }, setPrefIfUnset = (key, value) => {
     if (Services.prefs.getPrefType(key) === 0)
       setPref(key, value);
@@ -344,9 +341,9 @@
   }
   var isCompactMode = () => gZenCompactModeManager?.preference, inGlance = () => gBrowser.selectedTab.hasAttribute("glance-id"), togglePref = (prefName) => {
     let pref = getPref(prefName);
-    if (typeof pref === "boolean")
+    if (typeof pref !== "boolean")
       return;
-    setPref(!pref);
+    setPref(prefName, !pref);
   };
   function isPinnedTabDifferent() {
     if (!window.gZenPinnedTabManager)
@@ -968,6 +965,8 @@
       key: "command-palette:show",
       label: "Search Commands",
       command: () => {
+        if (gURLBar.searchMode?.engineName)
+          gURLBar.searchMode = null;
         gURLBar.value = PREFS2.prefix, gURLBar.focus(), gZenUIManager.onUrlbarOpen(), gZenUIManager.onFloatingURLBarOpen();
       },
       tags: ["commands", "palette", "all", "shortcuts"],
@@ -1016,6 +1015,39 @@
       },
       icon: "chrome://browser/skin/zen-icons/folder.svg",
       tags: ["folder", "expand", "group", "tabs", "all"]
+    },
+    {
+      key: "live-folder-github-pull-requests",
+      label: "Create Live Folder - Github Pull Requests",
+      icon: "chrome://browser/skin/zen-icons/selectable/logo-github.svg",
+      tags: ["live", "github", "Pull requests", "new", "create", "folder"],
+      command: () => {
+        let cmd = document.querySelector('[data-l10n-id="zen-live-folder-github-pull-requests"]');
+        if (cmd)
+          cmd.doCommand();
+      }
+    },
+    {
+      key: "live-folder-github-issues",
+      label: "Create Live Folder - Github Issues",
+      icon: "chrome://browser/skin/zen-icons/selectable/logo-github.svg",
+      tags: ["live", "github", "issues", "new", "create", "folder"],
+      command: () => {
+        let cmd = document.querySelector('[data-l10n-id="zen-live-folder-github-issues"]');
+        if (cmd)
+          cmd.doCommand();
+      }
+    },
+    {
+      key: "live-folder-rss",
+      label: "Create Live Folder - RSS",
+      icon: "chrome://browser/skin/zen-icons/selectable/logo-rss.svg",
+      tags: ["live", "github", "rss", "new", "create", "folder"],
+      command: () => {
+        let cmd = document.querySelector('[data-l10n-id="zen-live-folder-type-rss"]');
+        if (cmd)
+          cmd.doCommand();
+      }
     }
   ];
 
@@ -1101,6 +1133,18 @@
       _settings = null;
     }
   };
+
+  // utils/search-service.js
+  var _searchService;
+  async function getSearchService() {
+    if (_searchService)
+      return _searchService;
+    let { SearchService } = ChromeUtils.importESModule("moz-src:///toolkit/components/search/SearchService.sys.mjs");
+    return _searchService = SearchService, _searchService;
+  }
+  async function getVisibleEngines() {
+    return (await getSearchService()).getVisibleEngines();
+  }
 
   // command-palette/dynamic-commands.js
   var commandChainUtils = {
@@ -1222,9 +1266,7 @@
     }));
   }
   async function generateSearchEngineCommands() {
-    if (!Services.search)
-      return [];
-    return (await Services.search.getVisibleEngines()).map((engine) => {
+    return (await getVisibleEngines()).map((engine) => {
       let engineName = engine.name;
       return {
         key: `search:${engineName}`,
@@ -1236,9 +1278,6 @@
               engineName,
               entry: "oneoff"
             }, gURLBar2.focus();
-        },
-        condition: () => {
-          return (window.gURLBar.searchMode?.engineName || Services.search.defaultEngine?.name) !== engineName;
         },
         icon: getSearchEngineFavicon(engine),
         tags: ["search", "engine", engineName.toLowerCase()],
