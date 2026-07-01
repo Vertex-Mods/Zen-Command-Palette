@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.8.95
-// @lastUpdated     2026-06-21
+// @version         1.8.96
+// @lastUpdated     2026-07-01
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -157,7 +157,8 @@
     warning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>',
     broom: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m13 11l9-9m-7.4 10.6c.8.8.9 2.1.2 3L10 22l-8-8l6.4-4.8c.9-.7 2.2-.6 3 .2Zm-7.8-2.2l6.8 6.8M5 17l1.4-1.4"/></svg>',
     zoomReset: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m21 21l-6-6M3.268 12.043A7.02 7.02 0 0 0 9.902 17a7.01 7.01 0 0 0 7.043-6.131a7 7 0 0 0-5.314-7.672A7.02 7.02 0 0 0 3.39 7.6"/><path d="M3 4v4h4"/></g></svg>',
-    sine: '<svg fill-opacity="context-fill-opacity" fill="context-fill light-dark(black, white)" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 502.688 502.688" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M491.401,12.059c-23.467-23.467-70.4-9.6-145.067,42.667c-30.933-16-65.067-25.6-101.333-25.6 c-57.6,0-112,22.4-152.533,62.933c-68.267,68.267-81.067,170.667-38.4,252.8c-69.333,99.2-57.6,131.2-42.667,145.067 c7.467,7.467,18.133,11.733,29.867,11.733c23.467,0,54.4-13.867,98.133-40.533c7.467-5.333,16-10.667,24.533-17.067 c25.6,10.667,53.333,16,81.067,16c57.6,0,112-22.4,152.533-62.933c62.933-62.933,78.933-155.733,46.933-233.6 c6.4-8.533,11.733-17.067,18.133-25.6C504.201,73.925,512.734,33.392,491.401,12.059z M41.267,458.992 c1.067-8.533,7.467-32,37.333-77.867c4.267,5.333,8.533,10.667,13.867,16c8.533,8.533,18.133,16,27.733,23.467 C81.801,446.192,53.001,458.992,41.267,458.992z M156.467,394.992c-11.733-7.467-23.467-16-34.133-26.667 c-68.267-68.267-68.267-178.133,0-246.4c32-33.067,75.733-51.2,122.667-51.2s90.667,18.133,123.733,50.133 c10.667,10.667,20.267,22.4,26.667,35.2c-27.733,36.267-66.133,80-113.067,126.933 C235.401,329.925,192.734,367.259,156.467,394.992z M368.734,367.259c-33.067,33.067-77.867,52.267-123.733,52.267 c-13.867,0-27.733-2.133-41.6-5.333c36.267-28.8,74.667-62.933,112-100.267c37.333-37.333,70.4-74.667,99.2-110.933 C428.467,260.592,413.534,322.459,368.734,367.259z M422.067,120.858c-7.467-10.667-14.933-20.267-24.533-28.8 c-4.267-4.267-9.6-8.533-13.867-12.8c44.8-29.867,68.267-37.333,76.8-37.333C460.467,53.659,448.734,81.392,422.067,120.858z"></path></g></g></g></svg>'
+    sine: '<svg fill-opacity="context-fill-opacity" fill="context-fill light-dark(black, white)" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 502.688 502.688" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M491.401,12.059c-23.467-23.467-70.4-9.6-145.067,42.667c-30.933-16-65.067-25.6-101.333-25.6 c-57.6,0-112,22.4-152.533,62.933c-68.267,68.267-81.067,170.667-38.4,252.8c-69.333,99.2-57.6,131.2-42.667,145.067 c7.467,7.467,18.133,11.733,29.867,11.733c23.467,0,54.4-13.867,98.133-40.533c7.467-5.333,16-10.667,24.533-17.067 c25.6,10.667,53.333,16,81.067,16c57.6,0,112-22.4,152.533-62.933c62.933-62.933,78.933-155.733,46.933-233.6 c6.4-8.533,11.733-17.067,18.133-25.6C504.201,73.925,512.734,33.392,491.401,12.059z M41.267,458.992 c1.067-8.533,7.467-32,37.333-77.867c4.267,5.333,8.533,10.667,13.867,16c8.533,8.533,18.133,16,27.733,23.467 C81.801,446.192,53.001,458.992,41.267,458.992z M156.467,394.992c-11.733-7.467-23.467-16-34.133-26.667 c-68.267-68.267-68.267-178.133,0-246.4c32-33.067,75.733-51.2,122.667-51.2s90.667,18.133,123.733,50.133 c10.667,10.667,20.267,22.4,26.667,35.2c-27.733,36.267-66.133,80-113.067,126.933 C235.401,329.925,192.734,367.259,156.467,394.992z M368.734,367.259c-33.067,33.067-77.867,52.267-123.733,52.267 c-13.867,0-27.733-2.133-41.6-5.333c36.267-28.8,74.667-62.933,112-100.267c37.333-37.333,70.4-74.667,99.2-110.933 C428.467,260.592,413.534,322.459,368.734,367.259z M422.067,120.858c-7.467-10.667-14.933-20.267-24.533-28.8 c-4.267-4.267-9.6-8.533-13.867-12.8c44.8-29.867,68.267-37.333,76.8-37.333C460.467,53.659,448.734,81.392,422.067,120.858z"></path></g></g></g></svg>',
+    library: '<svg width="468" height="495" viewBox="0 0 468 495" fill="context-fill light-dark(black, white)" xmlns="http://www.w3.org/2000/svg"><path d="M113.971 227.157H355.109C367.371 227.157 377.311 237.346 377.311 249.916V357.664C377.311 359.86 377.008 361.984 376.442 363.993V374.105C376.442 420.407 339.826 457.941 294.657 457.941H172.682C127.514 457.941 90.898 420.407 90.898 374.105V316.518C90.898 312.347 91.195 308.249 91.769 304.243V249.916C91.769 237.346 101.708 227.157 113.971 227.157ZM160.071 284.602V296.34C160.071 306.305 167.951 314.383 177.672 314.383H290.493C300.213 314.383 308.094 306.305 308.094 296.34V284.602C308.094 274.638 300.213 266.56 290.493 266.56H177.672C167.951 266.56 160.071 274.638 160.071 284.602Z"/><path d="M275.313 86.365C294.977 86.365 310.917 71.9002 310.917 54.057C310.917 36.2138 294.977 21.749 275.313 21.749C255.649 21.749 239.709 36.2138 239.709 54.057C239.709 71.9002 255.649 86.365 275.313 86.365Z"/><path d="M165.5 98C152 71 138 70.5 129.5 93L107.633 147.117C107.492 147.752 107.364 148.381 107.247 149.001L59.5 175.5C32.8143 190.942 36.1944 205.138 88.1127 205.139H207.544C241.078 205.139 237 207 252 199C254.725 197.547 257 195.5 265.5 188C265.5 188 272 185.5 281.5 164C291 142.5 293 141.5 268.5 141.5H207.544C200.5 142 193.5 141 190.5 141.5L165.5 98Z"/></svg>'
   };
 
   // utils/pref.js
@@ -346,17 +347,13 @@
     setPref(prefName, !pref);
   };
   function isPinnedTabDifferent() {
-    if (!window.gZenPinnedTabManager)
+    let tab = gBrowser.selectedTab;
+    if (!tab?.pinned)
       return !1;
-    let currentTab = gBrowser.selectedTab;
-    if (!currentTab)
+    let originalUrl = tab._zenPinnedInitialState?.entry?.url;
+    if (!originalUrl)
       return !1;
-    if (!currentTab.pinned)
-      return !1;
-    let pin = gZenPinnedTabManager._pinsCache.find((pin2) => pin2.uuid === currentTab.getAttribute("zen-pin-id"));
-    if (!pin)
-      return !1;
-    return pin.url !== currentTab.linkedBrowser.currentURI.spec;
+    return originalUrl !== tab.linkedBrowser.currentURI.spec;
   }
   var commands = [
     {
@@ -1015,6 +1012,54 @@
       },
       icon: "chrome://browser/skin/zen-icons/folder.svg",
       tags: ["folder", "expand", "group", "tabs", "all"]
+    },
+    {
+      key: "toggle-zen-library",
+      label: "Toggle Zen Library",
+      tags: ["Download", "Media", "History", "spaces", "boosts"],
+      command: () => gZenLibrary.toggle(),
+      condition: () => !!gZenLibrary,
+      icon: svgToUrl(icons.library)
+    },
+    {
+      key: "open-zen-library-download",
+      label: "Open Zen library: Downloads",
+      tags: ["Download", "Library"],
+      command: () => gZenLibrary.openTab("downloads"),
+      condition: () => !!gZenLibrary,
+      icon: "chrome://browser/skin/downloads/downloads.svg"
+    },
+    {
+      key: "open-zen-library-history",
+      label: "Open Zen library: History",
+      tags: ["History", "Library"],
+      command: () => gZenLibrary.openTab("history"),
+      condition: () => !!gZenLibrary,
+      icon: "chrome://browser/skin/zen-icons/history.svg"
+    },
+    {
+      key: "open-zen-library-media",
+      label: "Open Zen library: Media",
+      tags: ["media", "Library"],
+      command: () => gZenLibrary.openTab("media"),
+      condition: () => !!gZenLibrary,
+      icon: "chrome://browser/skin/zen-icons/selectable/image.svg"
+    },
+    {
+      key: "open-zen-library-spaces",
+      label: "Open Zen library: Spaces",
+      tags: ["spaces", "Library"],
+      command: () => gZenLibrary.openTab("spaces"),
+      condition: () => !!gZenLibrary,
+      icon: "chrome://browser/skin/zen-icons/spaces.svg"
+    },
+    {
+      key: "open-zen-library-boosts",
+      label: "Open Zen library: Boosts",
+      tags: ["boosts", "Library"],
+      command: () => gZenLibrary.openTab("boosts"),
+      condition: () => !!gZenLibrary,
+      icon: "chrome://browser/skin/zen-icons/boost.svg"
     },
     {
       key: "live-folder-github-pull-requests",
