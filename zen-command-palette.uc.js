@@ -3163,7 +3163,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
         PREFS2.debugError("Could not load native globalActions, native commands will be unavailable.", e);
       }
       this.Settings = SettingsModal, this.Settings.init(this), PREFS2.debugLog("Settings modal initialized."), await this.loadUserConfig(), this.applyUserConfig(), PREFS2.debugLog("User config loaded and applied."), initShortcutRegistry(), PREFS2.debugLog("Shortcut registry initialized."), this.attachUrlbarListeners();
-      let { UrlbarProvider: UrlbarProviderFromUtils } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarUtils.sys.mjs"), { UrlbarShared } = ChromeUtils.importESModule("chrome://browser/content/urlbar/UrlbarShared.mjs"), UrlbarProvider = UrlbarProviderFromUtils;
+      let { UrlbarProvider: UrlbarProviderFromUtils, UrlbarUtils } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarUtils.sys.mjs"), { UrlbarShared } = ChromeUtils.importESModule("chrome://browser/content/urlbar/UrlbarShared.mjs"), UrlbarProvider = UrlbarProviderFromUtils;
       if (typeof UrlbarProvider > "u")
         try {
           ({ UrlbarProvider } = ChromeUtils.importESModule("moz-src:///browser/components/urlbar/UrlbarProvider.sys.mjs"));
@@ -3194,7 +3194,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
             return "TestProvider";
           }
           get type() {
-            return UrlbarShared.PROVIDER_TYPE.HEURISTIC;
+            return (UrlbarShared.PROVIDER_TYPE || UrlbarUtils.PROVIDER_TYPE).HEURISTIC;
           }
           getPriority() {
             return this._isInPrefixMode ? 1e4 : 0;
