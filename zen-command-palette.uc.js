@@ -2,8 +2,8 @@
 // @name            Zen Command Palette
 // @description     A powerful, extensible command interface for Zen Browser, seamlessly integrated into the URL bar. Inspired by Raycast and Arc.
 // @author          Bibek Bhusal
-// @version         1.9.12
-// @lastUpdated     2026-09-07
+// @version         2.0.0
+// @lastUpdated     2026-10-09
 // @ignorecache
 // @homepage        https://github.com/Vertex-Mods/Zen-Command-Palette
 // @onlyonce
@@ -139,8 +139,12 @@
   }
 
   // utils/icon.js
-  var svgToUrl = (iconSVG) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(iconSVG)}`;
-  var icons = {
+  var svgToUrl = (iconSVG) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(iconSVG)}`, textToSvgDataUrl = (text) => {
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-size="10" fill="currentColor">${text}</text>
+  </svg>`;
+    return svgToUrl(svg);
+  }, icons = {
     zoomIn: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21l-4.35-4.35M11 8v6m-3-3h6"/></g></svg>',
     zoomOut: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21l-4.35-4.35M8 11h6"/></g></svg>',
     book: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7v14m-9-3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4a4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3a3 3 0 0 0-3-3z"/></svg>',
@@ -149,7 +153,6 @@
     folderOut: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M2 7.5V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-1.5M2 13h10"/><path d="m5 10l-3 3l3 3"/></g></svg>',
     glass: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><path d="M14 15a2 2 0 0 0-2-2a2 2 0 0 0-2 2m-7.5-2L5 7c.7-1.3 1.4-2 3-2m13.5 8L19 7c-.7-1.3-1.5-2-3-2"/></g></svg>',
     pin: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17v5M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4a1 1 0 0 1 1 1z"/></svg>',
-    splitVz: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 19H5c-1 0-2-1-2-2V7c0-1 1-2 2-2h3m8 0h3c1 0 2 1 2 2v10c0 1-1 2-2 2h-3M12 4v16"/></svg>',
     star: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.12 2.12 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.12 2.12 0 0 0 1.597-1.16z"/></svg>',
     swap: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="context-fill light-dark(black, white)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-repeat-icon lucide-repeat"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>',
     warning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="context-fill light-dark(black, white)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>',
@@ -246,6 +249,9 @@
     static DYNAMIC_UNLOAD_TABS = "zen-command-palette.dynamic.unload-tab";
     static DYNAMIC_EXTENSION_ENABLE_DISABLE = "zen-command-palette.dynamic.extension-enable-disable";
     static DYNAMIC_EXTENSION_UNINSTALL = "zen-command-palette.dynamic.extension-uninstall";
+    static DYNAMIC_PROFILES = "zen-command-palette.dynamic.profiles";
+    static DYNAMIC_QUICK_SPLIT = "zen-command-palette.dynamic.quick-split";
+    static QUICK_SPLIT_SEARCH_ENGINE = "zen-command-palette.quick-split.search-engine";
     static COMMAND_SETTINGS_FILE = "zen-command-palette.settings-file-path";
     static COMMAND_TRUST_KEY = "zen-command-palette.command-trust-key";
     static defaultValues = {
@@ -258,7 +264,7 @@
       [CommandPalettePREFS.MIN_SCORE_THRESHOLD]: 150,
       [CommandPalettePREFS.DYNAMIC_ABOUT_PAGES]: !1,
       [CommandPalettePREFS.DYNAMIC_SEARCH_ENGINES]: !0,
-      [CommandPalettePREFS.DYNAMIC_EXTENSIONS]: !1,
+      [CommandPalettePREFS.DYNAMIC_EXTENSIONS]: !0,
       [CommandPalettePREFS.DYNAMIC_WORKSPACES]: !1,
       [CommandPalettePREFS.DYNAMIC_SINE_MODS]: !0,
       [CommandPalettePREFS.DYNAMIC_FOLDERS]: !0,
@@ -267,6 +273,9 @@
       [CommandPalettePREFS.DYNAMIC_UNLOAD_TABS]: !1,
       [CommandPalettePREFS.DYNAMIC_EXTENSION_ENABLE_DISABLE]: !1,
       [CommandPalettePREFS.DYNAMIC_EXTENSION_UNINSTALL]: !1,
+      [CommandPalettePREFS.DYNAMIC_PROFILES]: !0,
+      [CommandPalettePREFS.DYNAMIC_QUICK_SPLIT]: !0,
+      [CommandPalettePREFS.QUICK_SPLIT_SEARCH_ENGINE]: "",
       [CommandPalettePREFS.COMMAND_SETTINGS_FILE]: "chrome/zen-commands-settings.json"
     };
     static get prefix() {
@@ -311,8 +320,14 @@
     static get loadActiveTabs() {
       return this.getPref(this.DYNAMIC_ACTIVE_TABS);
     }
+    static get loadQuickSplit() {
+      return this.getPref(this.DYNAMIC_QUICK_SPLIT);
+    }
     static get commandSettingsFile() {
       return this.getPref(this.COMMAND_SETTINGS_FILE);
+    }
+    static get quickSplitSearchEngine() {
+      return this.getPref(this.QUICK_SPLIT_SEARCH_ENGINE);
     }
     static get commandTrustKey() {
       return this.getPref(this.COMMAND_TRUST_KEY, null);
@@ -462,7 +477,7 @@
       key: "cmd_zenGlanceSplit",
       label: "Split Glance",
       tags: ["glance", "split", "multitask", "peak", "horizontal", "vertical"],
-      icon: svgToUrl(icons.splitVz),
+      icon: "chrome://browser/skin/zen-icons/split.svg",
       condition: inGlance
     },
     {
@@ -1121,6 +1136,62 @@
     }
   ];
 
+  // command-palette/dynamic-commands/about.js
+  async function generateAboutPageCommands() {
+    return [
+      { page: "preferences", icon: "chrome://browser/skin/zen-icons/settings.svg" },
+      { page: "config", icon: "chrome://browser/skin/zen-icons/settings.svg" },
+      { page: "newtab", icon: "chrome://browser/skin/zen-icons/home.svg" },
+      { page: "addons", icon: "chrome://browser/skin/zen-icons/extension.svg" },
+      { page: "downloads", icon: "chrome://browser/skin/zen-icons/downloads.svg" },
+      { page: "debugging" },
+      { page: "deleteprofile" },
+      { page: "logins" },
+      { page: "editprofile" },
+      { page: "memory" },
+      { page: "newprofile" },
+      { page: "processes" },
+      { page: "profiles" },
+      { page: "serviceworkers" },
+      { page: "about" },
+      { page: "buildconfig" },
+      { page: "cache" },
+      { page: "certificate" },
+      { page: "checkerboard" },
+      { page: "compat" },
+      { page: "credits" },
+      { page: "support", icon: "chrome://browser/skin/zen-icons/info.svg" },
+      { page: "home", icon: "chrome://browser/skin/zen-icons/home.svg" },
+      { page: "license" },
+      { page: "logging" },
+      { page: "loginsimportreport" },
+      { page: "logo" },
+      { page: "mozilla" },
+      { page: "networking" },
+      { page: "policies" },
+      { page: "privatebrowsing", icon: "chrome://browser/skin/zen-icons/private-window.svg" },
+      { page: "profiling" },
+      { page: "protections" },
+      { page: "rights" },
+      { page: "robots" },
+      { page: "studies" },
+      { page: "sync-log" },
+      { page: "telemetry" },
+      { page: "third-party" },
+      { page: "unloads" },
+      { page: "url-classifier" },
+      { page: "webrtc" },
+      { page: "welcome" },
+      { page: "windows-messages" }
+    ].map((aboutPage) => ({
+      key: `about:${aboutPage.page}`,
+      label: `Open about:${aboutPage.page}`,
+      command: () => switchToTabHavingURI(`about:${aboutPage.page}`, !0),
+      condition: !!window.switchToTabHavingURI,
+      icon: aboutPage.icon || "chrome://browser/skin/zen-icons/tab.svg",
+      tags: ["about", "internal", aboutPage.page]
+    }));
+  }
   // utils/favicon.js
   function googleFaviconAPI(domainOrUrl, size = 32) {
     let domain;
@@ -1144,13 +1215,613 @@
     return "chrome://browser/skin/search-glass.svg";
   }
 
+  // utils/search-service.js
+  var _searchService;
+  async function getSearchService() {
+    if (_searchService)
+      return _searchService;
+    let { SearchService } = ChromeUtils.importESModule("moz-src:///toolkit/components/search/SearchService.sys.mjs");
+    return _searchService = SearchService, _searchService;
+  }
+  async function getVisibleEngines() {
+    return (await getSearchService()).getVisibleEngines();
+  }
+  async function getEngineByName(name) {
+    return (await getSearchService()).getEngineByName(name);
+  }
+  async function getDefaultEngine() {
+    return (await getSearchService()).getDefault();
+  }
+
+  // command-palette/dynamic-commands/search-engines.js
+  async function generateSearchEngineCommands() {
+    let engines = await getVisibleEngines(), defaultEngineName = null;
+    try {
+      defaultEngineName = (await getDefaultEngine())?.name ?? null;
+    } catch (e) {
+      PREFS2.debugError("Failed to get default search engine for command palette.", e);
+    }
+    return engines.map((engine) => {
+      let engineName = engine.name, isDefault = defaultEngineName !== null && engineName === defaultEngineName;
+      return {
+        key: `search:${engineName}`,
+        label: isDefault ? `Search with: ${engineName} (Default)` : `Search with: ${engineName}`,
+        command: () => {
+          let gURLBar2 = Services.wm.getMostRecentWindow("navigator:browser").gURLBar;
+          if (gURLBar2)
+            gURLBar2.value = "", gURLBar2.searchMode = {
+              engineName,
+              entry: "oneoff"
+            }, gURLBar2.focus();
+        },
+        icon: getSearchEngineFavicon(engine),
+        tags: isDefault ? ["search", "engine", "default", engineName.toLowerCase()] : ["search", "engine", engineName.toLowerCase()],
+        openUrl: !0
+      };
+    });
+  }
+  // command-palette/dynamic-commands/extensions.js
+  async function generateExtensionEnableDisableCommands() {
+    let addons = await AddonManager.getAddonsByTypes(["extension"]), commands = [];
+    for (let addon of addons) {
+      if (addon.isSystem)
+        continue;
+      if (addon.isActive)
+        commands.push({
+          key: `addon:disable:${addon.id}`,
+          label: "Disable Extension",
+          prettyName: addon.name,
+          command: () => addon.disable(),
+          icon: addon.iconURL || "chrome://mozapps/skin/extensions/extension.svg",
+          tags: ["extension", "addon", "disable", addon.name.toLowerCase()]
+        });
+      else
+        commands.push({
+          key: `addon:enable:${addon.id}`,
+          label: "Enable Extension",
+          prettyName: addon.name,
+          command: () => addon.enable(),
+          icon: addon.iconURL || "chrome://mozapps/skin/extensions/extension.svg",
+          tags: ["extension", "addon", "enable", addon.name.toLowerCase()]
+        });
+    }
+    return commands;
+  }
+  async function generateExtensionUninstallCommands() {
+    let addons = await AddonManager.getAddonsByTypes(["extension"]), commands = [];
+    for (let addon of addons) {
+      if (addon.isSystem)
+        continue;
+      commands.push({
+        key: `addon:uninstall:${addon.id}`,
+        label: "Uninstall Extension",
+        prettyName: addon.name,
+        command: () => {
+          if (confirm(`Are you sure you want to uninstall "${addon.name}"?`))
+            addon.uninstall();
+        },
+        icon: "chrome://browser/skin/zen-icons/edit-delete.svg",
+        tags: ["extension", "addon", "uninstall", "remove", addon.name.toLowerCase()]
+      });
+    }
+    return commands;
+  }
+  function triggerExtensionAction(addonId) {
+    let extension = globalThis.WebExtensionPolicy?.getByID(addonId)?.extension;
+    if (!extension)
+      return !1;
+    let browserWindow = Services.wm.getMostRecentWindow("navigator:browser") || window;
+    try {
+      let { ExtensionParent } = ChromeUtils.importESModule("resource://gre/modules/ExtensionParent.sys.mjs"), apiGlobal = ExtensionParent.apiManager?.global;
+      for (let getter of ["browserActionFor", "pageActionFor", "sidebarActionFor"])
+        try {
+          let forFn = apiGlobal?.[getter];
+          if (typeof forFn === "function") {
+            let action = forFn(extension);
+            if (action?.triggerAction)
+              return action.triggerAction(browserWindow), !0;
+          }
+        } catch {}
+    } catch (e) {
+      PREFS2.debugError("triggerExtensionAction via ExtensionParent failed", e);
+    }
+    try {
+      let button = browserWindow.document.querySelector(`toolbarbutton[data-extensionid="${addonId}"]`) || document.querySelector(`toolbarbutton[data-extensionid="${addonId}"]`);
+      if (button)
+        return button.click(), !0;
+    } catch (e) {
+      PREFS2.debugError("triggerExtensionAction via toolbar button failed", e);
+    }
+    return !1;
+  }
+  async function generateExtensionCommands() {
+    let addons;
+    try {
+      addons = await AddonManager.getAddonsByTypes(["extension"]);
+    } catch (e) {
+      return PREFS2.debugError("Failed to load addons for extension actions.", e), [];
+    }
+    let commands = [];
+    for (let addon of addons) {
+      if (!addon.isActive || addon.isSystem)
+        continue;
+      let extension = globalThis.WebExtensionPolicy?.getByID(addon.id)?.extension;
+      if (!extension)
+        continue;
+      let manifest = extension.manifest || {};
+      if (!!(manifest.action || manifest.browser_action || manifest.page_action))
+        commands.push({
+          key: `extension-action:${addon.id}`,
+          label: "Trigger Extension",
+          prettyName: addon.name,
+          command: () => triggerExtensionAction(addon.id),
+          icon: addon.iconURL || "chrome://mozapps/skin/extensions/extension.svg",
+          tags: ["extension", "addon", "trigger", "action", addon.name.toLowerCase()]
+        });
+      let extensionCommands = [];
+      try {
+        if (extension.shortcuts?.allCommands)
+          extensionCommands = await extension.shortcuts.allCommands();
+      } catch (e) {
+        PREFS2.debugError(`Failed to load commands for ${addon.id}`, e);
+        continue;
+      }
+      for (let cmd of extensionCommands) {
+        if (!cmd?.name || cmd.name.startsWith("_execute_"))
+          continue;
+        let cmdLabel = cmd.description || cmd.name;
+        commands.push({
+          key: `extension-command:${addon.id}:${cmd.name}`,
+          label: `${addon.name}: ${cmdLabel}`,
+          command: () => {
+            try {
+              extension.shortcuts.onCommand(cmd.name);
+            } catch (e) {
+              PREFS2.debugError(`Failed to run extension command ${cmd.name}`, e);
+            }
+          },
+          icon: addon.iconURL || "chrome://mozapps/skin/extensions/extension.svg",
+          shortcut: cmd.shortcut || null,
+          tags: [
+            "extension",
+            "addon",
+            "command",
+            "run",
+            addon.name.toLowerCase(),
+            cmd.name.toLowerCase(),
+            cmdLabel.toLowerCase()
+          ]
+        });
+      }
+    }
+    return commands;
+  }
+  // command-palette/dynamic-commands/containers.js
+  async function generateContainerTabCommands() {
+    if (!window.ContextualIdentityService)
+      return [];
+    let commands = [];
+    commands.push({
+      key: "container-tab:open-default",
+      label: "Open Tab without Container",
+      command: () => {
+        let tabToMove = gBrowser.selectedTab;
+        if (tabToMove && tabToMove.linkedBrowser) {
+          let url = tabToMove.linkedBrowser.currentURI.spec;
+          window.openTrustedLinkIn(url, "tab", {
+            userContextId: 0,
+            relatedToCurrent: !0,
+            triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
+          }), gBrowser.removeTab(tabToMove);
+        }
+      },
+      icon: "chrome://browser/skin/zen-icons/tab.svg",
+      tags: ["container", "tab", "open", "default", "no container"],
+      condition: () => {
+        let currentTab = gBrowser.selectedTab;
+        return currentTab && (currentTab.userContextId || 0) !== 0;
+      },
+      allowIcons: !0
+    });
+    let identities = ContextualIdentityService.getPublicIdentities();
+    if (!identities || identities.length === 0)
+      return commands;
+    return identities.forEach((identity) => {
+      let name = identity.name || identity.l10nId;
+      commands.push({
+        key: `container-tab:open:${identity.userContextId}`,
+        label: `Open Tab in: ${name}`,
+        command: () => {
+          let tabToMove = gBrowser.selectedTab;
+          if (tabToMove && tabToMove.linkedBrowser) {
+            let url = tabToMove.linkedBrowser.currentURI.spec;
+            window.openTrustedLinkIn(url, "tab", {
+              userContextId: identity.userContextId,
+              relatedToCurrent: !0,
+              triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
+            }), gBrowser.removeTab(tabToMove);
+          }
+        },
+        icon: svgToUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${identity.color}"><circle r="5" cx="8" cy="8" /></svg>`),
+        tags: ["container", "tab", "open", name.toLowerCase()],
+        condition: () => {
+          let currentTab = gBrowser.selectedTab;
+          return currentTab && (currentTab.userContextId || 0) !== identity.userContextId;
+        }
+      });
+    }), commands;
+  }
+  // command-palette/dynamic-commands/tabs.js
+  async function generateActiveTabCommands() {
+    let commands = [], tabs = window.gZenWorkspaces?.workspaceEnabled ? window.gZenWorkspaces.allStoredTabs : Array.from(gBrowser.tabs);
+    for (let tab of tabs) {
+      if (!tab.linkedBrowser)
+        continue;
+      if (tab.hasAttribute("zen-empty-tab"))
+        continue;
+      commands.push({
+        key: `switch-tab:${tab.label}`,
+        label: `Switch to Tab: ${tab.label}`,
+        command: () => {
+          if (window.gZenWorkspaces?.workspaceEnabled)
+            window.gZenWorkspaces.switchTabIfNeeded(tab);
+          else
+            gBrowser.selectedTab = tab;
+        },
+        condition: () => gBrowser.selectedTab !== tab,
+        icon: tab.image || "chrome://browser/skin/zen-icons/tab.svg",
+        tags: ["tab", "switch", "active", tab.label.toLowerCase()]
+      });
+    }
+    return commands;
+  }
+  async function generateUnloadTabCommands() {
+    let commands = [], tabs = window.gZenWorkspaces?.workspaceEnabled ? window.gZenWorkspaces.allStoredTabs : Array.from(gBrowser.tabs);
+    for (let tab of tabs) {
+      if (tab.hasAttribute("pending"))
+        continue;
+      if (tab.hasAttribute("zen-empty-tab") || !tab.linkedBrowser)
+        continue;
+      commands.push({
+        key: `unload-tab:${tab.linkedBrowser.outerWindowID}-${tab.linkedBrowser.tabId}`,
+        label: `Unload tab: ${tab.label}`,
+        command: () => gBrowser.discardBrowser(tab),
+        condition: () => gBrowser.selectedTab !== tab,
+        icon: tab.image || "chrome://browser/skin/zen-icons/close-all.svg",
+        tags: ["unload", "sleep", tab.label.toLowerCase()]
+      });
+    }
+    return commands;
+  }
+  // command-palette/dynamic-commands/workspaces.js
+  function workspacePretty(workspace) {
+    let accentColor;
+    try {
+      accentColor = window.gZenWorkspaces.workspaceElement(workspace.uuid)?.style.getPropertyValue("--zen-primary-color") || void 0;
+    } catch {}
+    return {
+      prettyName: workspace.name,
+      prettyIcon: workspace.icon || void 0,
+      accentColor
+    };
+  }
+  function generateWorkspaceCommands() {
+    if (!window.gZenWorkspaces?.workspaceEnabled)
+      return [];
+    let workspacesData = window.gZenWorkspaces.getWorkspaces();
+    if (!workspacesData)
+      return [];
+    return workspacesData.map((workspace) => ({
+      key: `workspace:${workspace.uuid}`,
+      label: "Focus on",
+      ...workspacePretty(workspace),
+      command: () => window.gZenWorkspaces.changeWorkspaceWithID(workspace.uuid),
+      condition: () => workspace.uuid !== window.gZenWorkspaces.activeWorkspace,
+      icon: "chrome://browser/skin/zen-icons/forward.svg",
+      tags: ["workspace", "switch", "focus", workspace.name.toLowerCase()]
+    }));
+  }
+  function generateWorkspaceMoveCommands() {
+    if (!window.gZenWorkspaces?.workspaceEnabled)
+      return [];
+    let commands = [], workspacesData = window.gZenWorkspaces.getWorkspaces();
+    if (!isNotEmptyTab())
+      return [];
+    if (!workspacesData)
+      return [];
+    let activeTab = gBrowser.selectedTab;
+    if (activeTab && !activeTab.hasAttribute("zen-essential"))
+      workspacesData.forEach((workspace) => {
+        if (activeTab.getAttribute("zen-workspace-id") === workspace.uuid)
+          return;
+        commands.push({
+          key: `workspace-move-active-to:${workspace.uuid}`,
+          label: "Move Tab to Workspace",
+          ...workspacePretty(workspace),
+          command: () => {
+            let tabToMove = gBrowser.selectedTab;
+            if (tabToMove)
+              gZenWorkspaces.moveTabToWorkspace(tabToMove, workspace.uuid), gZenWorkspaces.switchTabIfNeeded(tabToMove);
+          },
+          condition: () => !!gBrowser.selectedTab,
+          tags: ["workspace", "move", "tab", workspace.name.toLowerCase()]
+        });
+      });
+    return commands;
+  }
+  // command-palette/dynamic-commands/sine.js
+  async function generateSineCommands() {
+    if (!window.SineAPI)
+      return PREFS2.debugLog("SineAPI not found, skipping Sine command generation."), [];
+    let commands = [], installedMods = await SineAPI.utils.getMods(), marketplace = window.SineAPI?.manager?.marketplace;
+    if (marketplace) {
+      if (!marketplace.items)
+        marketplace.init();
+      let mods = marketplace.items;
+      for (let modId in mods)
+        if (!installedMods[modId]) {
+          let mod = mods[modId];
+          commands.push({
+            key: `sine:install:${modId}`,
+            label: `Install Sine Mod: ${mod.name}`,
+            command: () => {
+              SineAPI.manager.installMod(mod.homepage);
+            },
+            icon: svgToUrl(icons.sine),
+            tags: ["sine", "install", "mod", mod.name.toLowerCase()]
+          });
+        }
+    } else
+      PREFS2.debugLog("Sine marketplace object not found. 'Install' commands will be unavailable.");
+    for (let modId in installedMods) {
+      let mod = installedMods[modId];
+      commands.push({
+        key: `sine:uninstall:${modId}`,
+        label: `Uninstall Sine Mod: ${mod.name}`,
+        command: async () => {
+          if (window.confirm(`Are you sure you want to remove Sine mod "${mod.name}"?`))
+            try {
+              if (await SineAPI.manager.removeMod(mod.id), SineAPI.manager.rebuildMods(), mod.js)
+                try {
+                  showToast({
+                    title: `"${mod.name}" has been removed.`,
+                    description: "A restart is recommended to fully unload its scripts.",
+                    preset: 1
+                  });
+                } catch (e) {
+                  PREFS2.debugError("Failed to show toast:", e);
+                }
+            } catch (e) {
+              PREFS2.debugError("Failed to remove mod:", e);
+            }
+        },
+        icon: svgToUrl(icons.sine),
+        tags: ["sine", "uninstall", "mod", mod.name.toLowerCase()]
+      });
+    }
+    return commands;
+  }
+  // command-palette/dynamic-commands/folders.js
+  async function generateFolderCommands() {
+    if (!window.gZenFolders)
+      return [];
+    let commands = [], folders = Array.from(gBrowser.tabContainer.querySelectorAll("zen-folder"));
+    if (!folders.length)
+      return [];
+    folders.forEach((folder) => {
+      commands.push({
+        key: `folder-delete:${folder.id}`,
+        label: `Delete Folder: ${folder.label}`,
+        command: () => {
+          if (confirm(`Are you sure you want to delete the folder "${folder.label}" and all its tabs? This cannot be undone.`))
+            folder.delete();
+        },
+        icon: "chrome://browser/skin/zen-icons/edit-delete.svg",
+        tags: ["folder", "delete", "remove", folder.label.toLowerCase()],
+        allowShortcuts: !1
+      });
+    });
+    let activeTab = gBrowser.selectedTab;
+    if (activeTab && !activeTab.hasAttribute("zen-essential"))
+      folders.forEach((folder) => {
+        if (activeTab.group === folder)
+          return;
+        commands.push({
+          key: `folder-move-active-to:${folder.id}`,
+          label: `Move Tab to Folder: ${folder.label}`,
+          command: () => {
+            let tabToMove = gBrowser.selectedTab;
+            if (!tabToMove)
+              return;
+            let targetFolder = document.getElementById(folder.id);
+            if (!targetFolder)
+              return;
+            let targetWorkspaceId = targetFolder.getAttribute("zen-workspace-id");
+            if ((tabToMove.getAttribute("zen-workspace-id") || gZenWorkspaces.activeWorkspace) !== targetWorkspaceId)
+              gZenWorkspaces.moveTabToWorkspace(tabToMove, targetWorkspaceId);
+            if (!tabToMove.pinned)
+              gBrowser.pinTab(tabToMove);
+            if (targetFolder.addTabs([tabToMove]), gZenWorkspaces.activeWorkspace !== targetWorkspaceId)
+              gZenWorkspaces._lastSelectedWorkspaceTabs[targetWorkspaceId] = tabToMove, gZenWorkspaces.changeWorkspaceWithID(targetWorkspaceId);
+            else
+              gBrowser.selectedTab = tabToMove;
+          },
+          condition: () => {
+            let currentTab = gBrowser.selectedTab;
+            return currentTab && !currentTab.hasAttribute("zen-essential") && currentTab.group !== folder;
+          },
+          tags: ["folder", "move", "tab", folder.label.toLowerCase()]
+        });
+      });
+    return commands;
+  }
+  // command-palette/dynamic-commands/profiles.js
+  function loadToolkitProfileNames() {
+    let names = /* @__PURE__ */ new Map;
+    try {
+      let profileService = Cc["@mozilla.org/toolkit/profile-service;1"].getService(Ci.nsIToolkitProfileService);
+      for (let profile of profileService.profiles)
+        try {
+          let root = profile.rootDir?.path, name = String(profile.name ?? "").trim();
+          if (root && name)
+            names.set(root, name);
+        } catch {}
+    } catch {}
+    return names;
+  }
+  async function resolveProfileName(profile, numberedFallback, toolkitNames = null) {
+    let direct = String(profile.name ?? "").trim();
+    if (direct)
+      return direct;
+    try {
+      let safe = await profile.toContentSafeObject?.(), contentName = String(safe?.name ?? "").trim();
+      if (contentName)
+        return contentName;
+    } catch {}
+    try {
+      if (typeof profile.path === "string") {
+        let toolkitName = toolkitNames?.get(profile.path);
+        if (toolkitName)
+          return toolkitName;
+        let leaf = profile.path.split(/[/\\]/).pop() || "", suffix = leaf.includes(".") ? leaf.slice(leaf.indexOf(".") + 1).trim() : leaf.trim();
+        if (suffix)
+          return suffix;
+      }
+    } catch {}
+    return numberedFallback;
+  }
+  async function generateProfileCommands() {
+    let commands = [], seenPaths = /* @__PURE__ */ new Set;
+    try {
+      let profileService = Cc["@mozilla.org/toolkit/profile-service;1"].getService(Ci.nsIToolkitProfileService), currentRoot = profileService.currentProfile?.rootDir?.path, index = 0;
+      for (let profile of profileService.profiles) {
+        index++;
+        let root = null;
+        try {
+          root = profile.rootDir?.path;
+        } catch {}
+        if (!root || root === currentRoot)
+          continue;
+        seenPaths.add(root);
+        let name = await resolveProfileName(profile, `Profile ${index}`);
+        commands.push({
+          key: `profile:launch:${name}`,
+          label: `Switch to Profile: ${name}`,
+          command: () => Services.startup.createInstanceWithProfile(profile),
+          icon: "chrome://browser/skin/zen-icons/tab.svg",
+          tags: ["profile", "switch", "launch", name.toLowerCase()]
+        });
+      }
+    } catch (e) {
+      PREFS2.debugError("Failed to load toolkit profiles.", e);
+    }
+    try {
+      let { SelectableProfileService } = ChromeUtils.importESModule("resource:///modules/profiles/SelectableProfileService.sys.mjs"), profiles = await SelectableProfileService.getAllProfiles?.();
+      if (profiles?.length) {
+        let currentId = SelectableProfileService.currentProfile?.id, toolkitNames = loadToolkitProfileNames();
+        for (let profile of profiles) {
+          if (profile.id === currentId)
+            continue;
+          if (profile.path && seenPaths.has(profile.path))
+            continue;
+          let name = await resolveProfileName(profile, `Profile ${profile.id}`, toolkitNames), icon = "chrome://browser/skin/zen-icons/tab.svg";
+          try {
+            if (!profile.hasCustomAvatar && typeof profile.getAvatarPath === "function")
+              icon = profile.getAvatarPath(24) || icon;
+          } catch {}
+          commands.push({
+            key: `profile:switch:${profile.id}`,
+            label: `Switch to Profile: ${name}`,
+            command: () => SelectableProfileService.launchInstance(profile),
+            icon,
+            tags: ["profile", "switch", name.toLowerCase()]
+          });
+        }
+      }
+    } catch (e) {
+      PREFS2.debugError("Failed to load selectable profiles.", e);
+    }
+    if (!commands.length)
+      commands.push({
+        key: "profile:manage",
+        label: "Manage Profiles (about:profiles)",
+        command: () => switchToTabHavingURI("about:profiles", !0),
+        condition: !!window.switchToTabHavingURI,
+        icon: "chrome://browser/skin/zen-icons/container-tab.svg",
+        tags: ["profile", "manage", "about"]
+      });
+    return commands;
+  }
   // command-palette/utils/storage.js
-  var DEFAULTS = {
+  var DEFAULT_QUICK_SPLIT_KEYWORDS = {
+    ddg: "https://duckduckgo.com",
+    duckduckgo: "https://duckduckgo.com",
+    bing: "https://bing.com",
+    google: "https://google.com",
+    gmail: "https://mail.google.com",
+    mail: "https://mail.google.com",
+    drive: "https://drive.google.com",
+    docs: "https://docs.google.com",
+    calendar: "https://calendar.google.com",
+    cal: "https://calendar.google.com",
+    maps: "https://maps.google.com",
+    chatgpt: "https://chatgpt.com",
+    gpt: "https://chatgpt.com",
+    claude: "https://claude.ai",
+    gemini: "https://gemini.google.com",
+    perplexity: "https://perplexity.ai",
+    deepseek: "https://chat.deepseek.com",
+    reddit: "https://reddit.com",
+    x: "https://x.com",
+    twitter: "https://x.com",
+    instagram: "https://instagram.com",
+    ig: "https://instagram.com",
+    facebook: "https://facebook.com",
+    fb: "https://facebook.com",
+    tiktok: "https://tiktok.com",
+    linkedin: "https://linkedin.com",
+    yt: "https://youtube.com",
+    youtube: "https://youtube.com",
+    ytmusic: "https://music.youtube.com",
+    netflix: "https://netflix.com",
+    spotify: "https://open.spotify.com",
+    twitch: "https://twitch.tv",
+    prime: "https://www.primevideo.com",
+    imdb: "https://imdb.com",
+    bbc: "https://bbc.com",
+    amazon: "https://amazon.com",
+    ebay: "https://ebay.com",
+    discord: "https://discord.com",
+    whatsapp: "https://web.whatsapp.com",
+    telegram: "https://web.telegram.org",
+    zoom: "https://zoom.us",
+    gh: "https://github.com",
+    github: "https://github.com",
+    so: "https://stackoverflow.com",
+    stackoverflow: "https://stackoverflow.com",
+    mdn: "https://developer.mozilla.org",
+    npm: "https://npmjs.com",
+    hn: "https://news.ycombinator.com",
+    figma: "https://figma.com",
+    notion: "https://notion.so",
+    canva: "https://canva.com",
+    pinterest: "https://pinterest.com",
+    chess: "https://chess.com",
+    lichess: "https://lichess.org",
+    wikipedia: "https://wikipedia.org",
+    wiki: "https://wikipedia.org",
+    w: "https://wikipedia.org",
+    apple: "https://apple.com",
+    zen: "https://zen-browser.app",
+    "zen-mods": "https://zen-browser.app/mods",
+    "zen-reddit": "https://reddit.com/zen"
+  }, DEFAULTS = {
     hiddenCommands: [],
     customIcons: {},
     customShortcuts: {},
     toolbarButtons: [],
-    customCommands: []
+    customCommands: [],
+    quickSplitKeywords: { ...DEFAULT_QUICK_SPLIT_KEYWORDS }
   }, _settings = null, Storage = {
     _getFilePath() {
       let relativePath = PREFS2.commandSettingsFile;
@@ -1196,28 +1867,10 @@
         PREFS2.debugError("Error saving command palette settings:", e);
       }
     },
-    getSettings() {
-      return _settings || DEFAULTS;
-    },
     reset() {
       _settings = null;
     }
   };
-
-  // utils/search-service.js
-  var _searchService;
-  async function getSearchService() {
-    if (_searchService)
-      return _searchService;
-    let { SearchService } = ChromeUtils.importESModule("moz-src:///toolkit/components/search/SearchService.sys.mjs");
-    return _searchService = SearchService, _searchService;
-  }
-  async function getVisibleEngines() {
-    return (await getSearchService()).getVisibleEngines();
-  }
-  async function getDefaultEngine() {
-    return (await getSearchService()).getDefault();
-  }
 
   // command-palette/utils/trust.js
   var _cachedTrustKeyHex = null, _cachedCryptoKey = null, _approvedHashes = null;
@@ -1296,6 +1949,224 @@
     }
   }
 
+  // utils/parse.js
+  var parseElement = (elementString, type = "html") => {
+    if (type === "xul")
+      return window.MozXULElement.parseXULToFragment(elementString).firstChild;
+    let element = new DOMParser().parseFromString(elementString, "text/html");
+    if (element.body.children.length)
+      element = element.body.firstChild;
+    else
+      element = element.head.firstChild;
+    return element;
+  }, escapeXmlAttribute = (str) => {
+    if (typeof str !== "string")
+      return str;
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+  }, xulImage = (src = "", className = "") => parseElement(`<image${className ? ` class="${escapeXmlAttribute(className)}"` : ""}${src ? ` src="${escapeXmlAttribute(src)}"` : ""}/>`, "xul");
+
+  // utils/code-highlight.js
+  var JS_KEYWORDS = new Set("break case catch class const continue debugger default delete do else export extends finally for function if import in instanceof let new return static super switch throw try typeof var void while with yield async await of from as get set constructor".split(" ")), PY_KEYWORDS = new Set("and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield True False None".split(" ")), CSS_AT_RULES = new Set(["media", "import", "keyframes", "font-face", "supports", "charset", "namespace"].map((r) => `@${r}`));
+  function escapeHtml(text) {
+    return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function span(cls, raw) {
+    return `<span class="${cls}">${escapeHtml(raw)}</span>`;
+  }
+  function tokenize(code, re, classify) {
+    let src = String(code), rx = new RegExp(re.source, "g"), out = "", last = 0, m;
+    while ((m = rx.exec(src)) !== null)
+      if (out += escapeHtml(src.slice(last, m.index)), out += classify(m), last = m.index + m[0].length, m[0].length === 0)
+        rx.lastIndex++;
+    return out += escapeHtml(src.slice(last)), out;
+  }
+  var JS_RE = /(\/\*[\s\S]*?(?:\*\/|$))|(\/\/[^\n]*)|(`(?:[^`\\]|\\.)*(?:`|$))|('(?:[^'\\\n]|\\.)*(?:'|$))|("(?:[^"\\\n]|\\.)*(?:"|$))|\b(\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?n?)\b|\b([A-Za-z_$][\w$]*)(?=\s*\()|\b([A-Za-z_$][\w$]*)\b/g, JS_CONSTANTS = /* @__PURE__ */ new Set([
+    "true",
+    "false",
+    "null",
+    "undefined",
+    "NaN",
+    "Infinity",
+    "this",
+    "super"
+  ]);
+  function highlightJS(code) {
+    return tokenize(code, JS_RE, (m) => {
+      let [full, blockComment, lineComment, tpl, sq, dq, num, call, word] = m;
+      if (blockComment ?? lineComment)
+        return span("pl-c", full);
+      if (tpl ?? sq ?? dq)
+        return span("pl-s", full);
+      if (num)
+        return span("pl-c1", full);
+      if (call) {
+        if (JS_KEYWORDS.has(call))
+          return span("pl-k", full);
+        if (JS_CONSTANTS.has(call))
+          return span("pl-c1", full);
+        return span("pl-en", full);
+      }
+      if (word) {
+        if (JS_KEYWORDS.has(word))
+          return span("pl-k", full);
+        if (JS_CONSTANTS.has(word))
+          return span("pl-c1", full);
+        if (/^[A-Z]/.test(word))
+          return span("pl-en", full);
+        return escapeHtml(full);
+      }
+      return escapeHtml(full);
+    });
+  }
+  var PY_RE = /(#[^\n]*)|('''[\s\S]*?(?:'''|$)|"""[\s\S]*?(?:"""|$))|('(?:[^'\\\n]|\\.)*(?:'|$))|("(?:[^"\\\n]|\\.)*(?:"|$))|\b(\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?j?)\b|\b([A-Za-z_]\w*)\b/g;
+  function highlightPython(code) {
+    return tokenize(code, PY_RE, (m) => {
+      let [full, comment, triple, sq, dq, num, word] = m;
+      if (comment)
+        return span("pl-c", full);
+      if (triple ?? sq ?? dq)
+        return span("pl-s", full);
+      if (num)
+        return span("pl-c1", full);
+      if (word) {
+        if (PY_KEYWORDS.has(word))
+          return span("pl-k", full);
+        if (/^[A-Z]/.test(word))
+          return span("pl-en", full);
+        return escapeHtml(full);
+      }
+      return escapeHtml(full);
+    });
+  }
+  var MARKUP_RE = /(<!--[\s\S]*?(?:-->|$))|(<\/?[A-Za-z][\w:.-]*|\/?>)|([A-Za-z_:][\w:.-]*)(?=\s*=\s*["'])|('(?:[^'\\]|\\.)*(?:'|$))|("(?:[^"\\]|\\.)*(?:"|$))/g;
+  function highlightMarkup(code) {
+    return tokenize(code, MARKUP_RE, (m) => {
+      let [full, comment, tag, attr, sq, dq] = m;
+      if (comment)
+        return span("pl-c", full);
+      if (tag)
+        return span("pl-ent", full);
+      if (attr)
+        return span("pl-c1", full);
+      if (sq ?? dq)
+        return span("pl-s", full);
+      return escapeHtml(full);
+    });
+  }
+  var CSS_RE = /(\/\*[\s\S]*?(?:\*\/|$))|("(?:[^"\\]|\\.)*(?:"|$))|('(?:[^'\\]|\\.)*(?:'|$))|(@[\w-]+)|(#(?:[\da-fA-F]{3,8})\b)|(\b\d+(?:\.\d+)?(?:px|em|rem|%|vh|vw|s|ms|deg)?\b)|([A-Za-z-][\w-]*)(?=\s*:)/g;
+  function highlightCSS(code) {
+    return tokenize(code, CSS_RE, (m) => {
+      let [full, comment, dq, sq, at, hex, num, prop] = m;
+      if (comment)
+        return span("pl-c", full);
+      if (dq ?? sq)
+        return span("pl-s", full);
+      if (at)
+        return CSS_AT_RULES.has(at) ? span("pl-k", full) : span("pl-en", full);
+      if (hex ?? num)
+        return span("pl-c1", full);
+      if (prop)
+        return span("pl-c1", full);
+      return escapeHtml(full);
+    });
+  }
+  var GENERIC_RE = /(\/\*[\s\S]*?(?:\*\/|$))|(\/\/[^\n]*|#[^\n]*)|(`(?:[^`\\]|\\.)*(?:`|$))|('(?:[^'\\\n]|\\.)*(?:'|$))|("(?:[^"\\\n]|\\.)*(?:"|$))|\b(\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?)\b/g;
+  function highlightGeneric(code) {
+    return tokenize(code, GENERIC_RE, (m) => {
+      let [full, blockComment, lineComment, tpl, sq, dq, num] = m;
+      if (blockComment ?? lineComment)
+        return span("pl-c", full);
+      if (tpl ?? sq ?? dq)
+        return span("pl-s", full);
+      if (num)
+        return span("pl-c1", full);
+      return escapeHtml(full);
+    });
+  }
+  var LANG_ALIASES = {
+    js: "js",
+    javascript: "js",
+    jsx: "js",
+    ts: "js",
+    typescript: "js",
+    tsx: "js",
+    mjs: "js",
+    cjs: "js",
+    json: "js",
+    jsonc: "js",
+    py: "python",
+    python: "python",
+    html: "markup",
+    xml: "markup",
+    svg: "markup",
+    css: "css"
+  };
+  function highlightCode(code, lang) {
+    let normalized = String(lang || "").trim().toLowerCase(), kind = LANG_ALIASES[normalized] || (normalized ? "generic" : "js");
+    if (kind === "js")
+      return highlightJS(code);
+    if (kind === "python")
+      return highlightPython(code);
+    if (kind === "markup")
+      return highlightMarkup(code);
+    if (kind === "css")
+      return highlightCSS(code);
+    return highlightGeneric(code);
+  }
+  function attachCodeEditor(textarea, { language = "javascript" } = {}) {
+    if (!textarea?.parentNode)
+      return () => {};
+    let wrap = parseElement('<div class="zenux-code-editor"></div>'), pre = parseElement('<pre class="zenux-code-backdrop" aria-hidden="true"><code></code></pre>'), codeEl = pre.querySelector("code");
+    textarea.before(wrap), wrap.appendChild(pre), wrap.appendChild(textarea);
+    let update = () => {
+      codeEl.innerHTML = highlightCode(`${textarea.value || ""}
+`, language);
+    }, syncScroll = () => {
+      pre.scrollTop = textarea.scrollTop, pre.scrollLeft = textarea.scrollLeft;
+    }, onInput = () => {
+      update(), syncScroll();
+    };
+    return textarea.addEventListener("input", onInput), textarea.addEventListener("scroll", syncScroll), update(), () => {
+      textarea.removeEventListener("input", onInput), textarea.removeEventListener("scroll", syncScroll), wrap.before(textarea), wrap.remove();
+    };
+  }
+  function confirmCodeExecution({ name = "", code = "", language = "javascript" } = {}) {
+    return new Promise((resolve) => {
+      let title = name ? `Run "${name}"?` : "Run custom JS command?", overlay = parseElement(`
+      <div class="zenux-code-confirm-overlay">
+        <div class="zenux-code-confirm-modal" role="dialog" aria-modal="true">
+          <div class="zenux-code-confirm-head">${icons.warning}<h3>${escapeXmlAttribute(title)}</h3></div>
+          <div class="zenux-code-confirm-body">
+            <p>This will execute the following JavaScript in the browser chrome context.</p>
+            <div class="zenux-code-confirm-warning">${icons.warning}<span>Only proceed if you trust the source of this command. Malicious code can compromise your browser.</span></div>
+            <pre class="zenux-code-confirm-code"><code>${highlightCode(code, language)}</code></pre>
+          </div>
+          <div class="zenux-code-confirm-actions">
+            <button class="zenux-btn-ghost" data-action="cancel">Cancel</button>
+            <button class="zenux-btn-primary" data-action="run">Run Command</button>
+          </div>
+        </div>
+      </div>
+    `), settled = !1, done = (value) => {
+        if (settled)
+          return;
+        settled = !0, overlay.remove(), document.removeEventListener("keydown", onKeyDown, !0), resolve(value);
+      }, onKeyDown = (e) => {
+        if (e.key === "Escape")
+          e.preventDefault(), e.stopPropagation(), done(!1);
+      };
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay)
+          done(!1);
+        let action = e.target.closest?.("[data-action]")?.dataset.action;
+        if (action === "run")
+          done(!0);
+        else if (action === "cancel")
+          done(!1);
+      }), document.addEventListener("keydown", onKeyDown, !0), document.documentElement.appendChild(overlay), overlay.querySelector('[data-action="cancel"]')?.focus();
+    });
+  }
+
   // utils/open-link.js
   async function openLink(url, where = "new tab") {
     if (!url)
@@ -1333,22 +2204,37 @@
           }
         break;
       }
+      case "vsep":
       case "vsplit":
-      case "hsplit":
-        if (window.gZenViewSplitter) {
-          let sep = destination === "vsplit" ? "vsep" : "hsep", tab1 = gBrowser.selectedTab;
-          await openTrustedLinkIn(url, "tab");
-          let tab2 = gBrowser.selectedTab;
-          return gZenViewSplitter.splitTabs([tab1, tab2], sep, 1), !0;
-        }
-        break;
+      case "hsep":
+      case "hsplit": {
+        let splitter = window.gZenViewSplitter;
+        if (!splitter)
+          break;
+        let sep = destination.startsWith("v") ? "vsep" : "hsep", side = sep === "vsep" ? "right" : "bottom", currentTab = gBrowser.selectedTab, wasInGroup = !!currentTab?.splitView;
+        await openTrustedLinkIn(url, "tab");
+        let newTab = gBrowser.selectedTab;
+        splitter.splitTabs([currentTab, newTab], sep, 1);
+        let group = splitter._data.find((g) => g.tabs.includes(newTab));
+        if (!group || group.gridType === sep)
+          return !0;
+        if (!wasInGroup || group.tabs.length <= 2)
+          return splitter.splitTabs([...group.tabs], sep, group.tabs.indexOf(newTab)), !0;
+        let curNode = splitter.getSplitNodeFromTab(currentTab), newNode = splitter.getSplitNodeFromTab(newTab);
+        if (!curNode?.parent || !newNode?.parent || curNode === newNode)
+          return splitter.splitTabs([...group.tabs], sep, group.tabs.indexOf(newTab)), !0;
+        let oldParent = newNode.parent;
+        oldParent.children.splice(oldParent.children.indexOf(newNode), 1);
+        let restore = (oldParent.children.length + 1) / oldParent.children.length;
+        return oldParent.children.forEach((c) => c.sizeInParent *= restore), splitter.splitIntoNode(curNode, newNode, side, 0.5), splitter.activateSplitView(group, !0), !0;
+      }
       default:
         break;
     }
     return openTrustedLinkIn(url, "tab"), !1;
   }
 
-  // command-palette/dynamic-commands.js
+  // command-palette/dynamic-commands/custom.js
   var commandChainUtils = {
     async openLink(params) {
       let { link, where = "new tab" } = params;
@@ -1377,371 +2263,6 @@
       }
     }
   };
-  async function generateAboutPageCommands() {
-    return [
-      { page: "preferences", icon: "chrome://browser/skin/zen-icons/settings.svg" },
-      { page: "config", icon: "chrome://browser/skin/zen-icons/settings.svg" },
-      { page: "newtab", icon: "chrome://browser/skin/zen-icons/home.svg" },
-      { page: "addons", icon: "chrome://browser/skin/zen-icons/extension.svg" },
-      { page: "downloads", icon: "chrome://browser/skin/zen-icons/downloads.svg" },
-      { page: "debugging" },
-      { page: "deleteprofile" },
-      { page: "logins" },
-      { page: "editprofile" },
-      { page: "memory" },
-      { page: "newprofile" },
-      { page: "processes" },
-      { page: "profiles" },
-      { page: "serviceworkers" },
-      { page: "about" },
-      { page: "buildconfig" },
-      { page: "cache" },
-      { page: "certificate" },
-      { page: "checkerboard" },
-      { page: "compat" },
-      { page: "credits" },
-      { page: "support", icon: "chrome://browser/skin/zen-icons/info.svg" },
-      { page: "home", icon: "chrome://browser/skin/zen-icons/home.svg" },
-      { page: "license" },
-      { page: "logging" },
-      { page: "loginsimportreport" },
-      { page: "logo" },
-      { page: "mozilla" },
-      { page: "networking" },
-      { page: "policies" },
-      { page: "privatebrowsing", icon: "chrome://browser/skin/zen-icons/private-window.svg" },
-      { page: "profiling" },
-      { page: "protections" },
-      { page: "rights" },
-      { page: "robots" },
-      { page: "studies" },
-      { page: "sync-log" },
-      { page: "telemetry" },
-      { page: "third-party" },
-      { page: "unloads" },
-      { page: "url-classifier" },
-      { page: "webrtc" },
-      { page: "welcome" },
-      { page: "windows-messages" }
-    ].map((aboutPage) => ({
-      key: `about:${aboutPage.page}`,
-      label: `Open about:${aboutPage.page}`,
-      command: () => switchToTabHavingURI(`about:${aboutPage.page}`, !0),
-      condition: !!window.switchToTabHavingURI,
-      icon: aboutPage.icon || "chrome://browser/skin/zen-icons/tab.svg",
-      tags: ["about", "internal", aboutPage.page]
-    }));
-  }
-  async function generateSearchEngineCommands() {
-    let engines = await getVisibleEngines(), defaultEngineName = null;
-    try {
-      defaultEngineName = (await getDefaultEngine())?.name ?? null;
-    } catch (e) {
-      PREFS2.debugError("Failed to get default search engine for command palette.", e);
-    }
-    return engines.map((engine) => {
-      let engineName = engine.name, isDefault = defaultEngineName !== null && engineName === defaultEngineName;
-      return {
-        key: `search:${engineName}`,
-        label: isDefault ? `Search with: ${engineName} (Default)` : `Search with: ${engineName}`,
-        command: () => {
-          let gURLBar2 = Services.wm.getMostRecentWindow("navigator:browser").gURLBar;
-          if (gURLBar2)
-            gURLBar2.value = "", gURLBar2.searchMode = {
-              engineName,
-              entry: "oneoff"
-            }, gURLBar2.focus();
-        },
-        icon: getSearchEngineFavicon(engine),
-        tags: isDefault ? ["search", "engine", "default", engineName.toLowerCase()] : ["search", "engine", engineName.toLowerCase()],
-        openUrl: !0
-      };
-    });
-  }
-  async function generateExtensionEnableDisableCommands() {
-    let addons = await AddonManager.getAddonsByTypes(["extension"]), commands = [];
-    for (let addon of addons) {
-      if (addon.isSystem)
-        continue;
-      if (addon.isActive)
-        commands.push({
-          key: `addon:disable:${addon.id}`,
-          label: `Disable Extension: ${addon.name}`,
-          command: () => addon.disable(),
-          icon: addon.iconURL || "chrome://mozapps/skin/extensions/extension.svg",
-          tags: ["extension", "addon", "disable", addon.name.toLowerCase()]
-        });
-      else
-        commands.push({
-          key: `addon:enable:${addon.id}`,
-          label: `Enable Extension: ${addon.name}`,
-          command: () => addon.enable(),
-          icon: addon.iconURL || "chrome://mozapps/skin/extensions/extension.svg",
-          tags: ["extension", "addon", "enable", addon.name.toLowerCase()]
-        });
-    }
-    return commands;
-  }
-  async function generateExtensionUninstallCommands() {
-    let addons = await AddonManager.getAddonsByTypes(["extension"]), commands = [];
-    for (let addon of addons) {
-      if (addon.isSystem)
-        continue;
-      commands.push({
-        key: `addon:uninstall:${addon.id}`,
-        label: `Uninstall Extension: ${addon.name}`,
-        command: () => {
-          if (confirm(`Are you sure you want to uninstall "${addon.name}"?`))
-            addon.uninstall();
-        },
-        icon: "chrome://browser/skin/zen-icons/edit-delete.svg",
-        tags: ["extension", "addon", "uninstall", "remove", addon.name.toLowerCase()]
-      });
-    }
-    return commands;
-  }
-  async function generateExtensionCommands() {
-    return (await AddonManager.getAddonsByTypes(["extension"])).filter((addon) => addon.isActive && !addon.isSystem && addon.optionsURL).map((addon) => ({
-      key: `extension:${addon.id}`,
-      label: `Extension Options: ${addon.name}`,
-      command: () => BrowserAddonUI.openAddonsMgr("addons://detail/" + encodeURIComponent(addon.id) + "/preferences"),
-      icon: addon.iconURL || "chrome://mozapps/skin/extensions/extension.svg",
-      tags: [
-        "extension",
-        "addon",
-        "options",
-        addon.name.toLowerCase(),
-        addon.name.toLowerCase(),
-        addon.name.toLowerCase()
-      ]
-    }));
-  }
-  async function generateContainerTabCommands() {
-    if (!window.ContextualIdentityService)
-      return [];
-    let commands = [];
-    commands.push({
-      key: "container-tab:open-default",
-      label: "Open Tab without Container",
-      command: () => {
-        let tabToMove = gBrowser.selectedTab;
-        if (tabToMove && tabToMove.linkedBrowser) {
-          let url = tabToMove.linkedBrowser.currentURI.spec;
-          window.openTrustedLinkIn(url, "tab", {
-            userContextId: 0,
-            relatedToCurrent: !0,
-            triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
-          }), gBrowser.removeTab(tabToMove);
-        }
-      },
-      icon: "chrome://browser/skin/zen-icons/tab.svg",
-      tags: ["container", "tab", "open", "default", "no container"],
-      condition: () => {
-        let currentTab = gBrowser.selectedTab;
-        return currentTab && (currentTab.userContextId || 0) !== 0;
-      },
-      allowIcons: !0
-    });
-    let identities = ContextualIdentityService.getPublicIdentities();
-    if (!identities || identities.length === 0)
-      return commands;
-    return identities.forEach((identity) => {
-      let name = identity.name || identity.l10nId;
-      commands.push({
-        key: `container-tab:open:${identity.userContextId}`,
-        label: `Open Tab in: ${name}`,
-        command: () => {
-          let tabToMove = gBrowser.selectedTab;
-          if (tabToMove && tabToMove.linkedBrowser) {
-            let url = tabToMove.linkedBrowser.currentURI.spec;
-            window.openTrustedLinkIn(url, "tab", {
-              userContextId: identity.userContextId,
-              relatedToCurrent: !0,
-              triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
-            }), gBrowser.removeTab(tabToMove);
-          }
-        },
-        icon: svgToUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${identity.color}"><circle r="5" cx="8" cy="8" /></svg>`),
-        tags: ["container", "tab", "open", name.toLowerCase()],
-        condition: () => {
-          let currentTab = gBrowser.selectedTab;
-          return currentTab && (currentTab.userContextId || 0) !== identity.userContextId;
-        }
-      });
-    }), commands;
-  }
-  async function generateActiveTabCommands() {
-    let commands = [], tabs = window.gZenWorkspaces?.workspaceEnabled ? window.gZenWorkspaces.allStoredTabs : Array.from(gBrowser.tabs);
-    for (let tab of tabs) {
-      if (!tab.linkedBrowser)
-        continue;
-      if (tab.hasAttribute("zen-empty-tab"))
-        continue;
-      commands.push({
-        key: `switch-tab:${tab.label}`,
-        label: `Switch to Tab: ${tab.label}`,
-        command: () => {
-          if (window.gZenWorkspaces?.workspaceEnabled)
-            window.gZenWorkspaces.switchTabIfNeeded(tab);
-          else
-            gBrowser.selectedTab = tab;
-        },
-        condition: () => gBrowser.selectedTab !== tab,
-        icon: tab.image || "chrome://browser/skin/zen-icons/tab.svg",
-        tags: ["tab", "switch", "active", tab.label.toLowerCase()]
-      });
-    }
-    return commands;
-  }
-  async function generateUnloadTabCommands() {
-    let commands = [], tabs = window.gZenWorkspaces?.workspaceEnabled ? window.gZenWorkspaces.allStoredTabs : Array.from(gBrowser.tabs);
-    for (let tab of tabs) {
-      if (tab.hasAttribute("pending"))
-        continue;
-      if (tab.hasAttribute("zen-empty-tab") || !tab.linkedBrowser)
-        continue;
-      commands.push({
-        key: `unload-tab:${tab.linkedBrowser.outerWindowID}-${tab.linkedBrowser.tabId}`,
-        label: `Unload tab: ${tab.label}`,
-        command: () => gBrowser.discardBrowser(tab),
-        condition: () => gBrowser.selectedTab !== tab,
-        icon: tab.image || "chrome://browser/skin/zen-icons/close-all.svg",
-        tags: ["unload", "sleep", tab.label.toLowerCase()]
-      });
-    }
-    return commands;
-  }
-  async function generateSineCommands() {
-    if (!window.SineAPI)
-      return PREFS2.debugLog("SineAPI not found, skipping Sine command generation."), [];
-    let commands = [], installedMods = await SineAPI.utils.getMods(), marketplace = window.SineAPI?.manager?.marketplace;
-    if (marketplace) {
-      if (!marketplace.items)
-        marketplace.init();
-      let mods = marketplace.items;
-      for (let modId in mods)
-        if (!installedMods[modId]) {
-          let mod = mods[modId];
-          commands.push({
-            key: `sine:install:${modId}`,
-            label: `Install Sine Mod: ${mod.name}`,
-            command: () => {
-              SineAPI.manager.installMod(mod.homepage);
-            },
-            icon: svgToUrl(icons.sine),
-            tags: ["sine", "install", "mod", mod.name.toLowerCase()]
-          });
-        }
-    } else
-      PREFS2.debugLog("Sine marketplace object not found. 'Install' commands will be unavailable.");
-    for (let modId in installedMods) {
-      let mod = installedMods[modId];
-      commands.push({
-        key: `sine:uninstall:${modId}`,
-        label: `Uninstall Sine Mod: ${mod.name}`,
-        command: async () => {
-          if (window.confirm(`Are you sure you want to remove Sine mod "${mod.name}"?`))
-            try {
-              if (await SineAPI.manager.removeMod(mod.id), SineAPI.manager.rebuildMods(), mod.js)
-                try {
-                  showToast({
-                    title: `"${mod.name}" has been removed.`,
-                    description: "A restart is recommended to fully unload its scripts.",
-                    preset: 1
-                  });
-                } catch (e) {
-                  PREFS2.debugError("Failed to show toast:", e);
-                }
-            } catch (e) {
-              PREFS2.debugError("Failed to remove mod:", e);
-            }
-        },
-        icon: svgToUrl(icons.sine),
-        tags: ["sine", "uninstall", "mod", mod.name.toLowerCase()]
-      });
-    }
-    return commands;
-  }
-  async function generateFolderCommands() {
-    if (!window.gZenFolders)
-      return [];
-    let commands = [], folders = Array.from(gBrowser.tabContainer.querySelectorAll("zen-folder"));
-    if (!folders.length)
-      return [];
-    folders.forEach((folder) => {
-      commands.push({
-        key: `folder-delete:${folder.id}`,
-        label: `Delete Folder: ${folder.label}`,
-        command: () => {
-          if (confirm(`Are you sure you want to delete the folder "${folder.label}" and all its tabs? This cannot be undone.`))
-            folder.delete();
-        },
-        icon: "chrome://browser/skin/zen-icons/edit-delete.svg",
-        tags: ["folder", "delete", "remove", folder.label.toLowerCase()],
-        allowShortcuts: !1
-      });
-    });
-    let activeTab = gBrowser.selectedTab;
-    if (activeTab && !activeTab.hasAttribute("zen-essential"))
-      folders.forEach((folder) => {
-        if (activeTab.group === folder)
-          return;
-        commands.push({
-          key: `folder-move-active-to:${folder.id}`,
-          label: `Move Tab to Folder: ${folder.label}`,
-          command: () => {
-            let tabToMove = gBrowser.selectedTab;
-            if (!tabToMove)
-              return;
-            let targetFolder = document.getElementById(folder.id);
-            if (!targetFolder)
-              return;
-            let targetWorkspaceId = targetFolder.getAttribute("zen-workspace-id");
-            if ((tabToMove.getAttribute("zen-workspace-id") || gZenWorkspaces.activeWorkspace) !== targetWorkspaceId)
-              gZenWorkspaces.moveTabToWorkspace(tabToMove, targetWorkspaceId);
-            if (!tabToMove.pinned)
-              gBrowser.pinTab(tabToMove);
-            if (targetFolder.addTabs([tabToMove]), gZenWorkspaces.activeWorkspace !== targetWorkspaceId)
-              gZenWorkspaces._lastSelectedWorkspaceTabs[targetWorkspaceId] = tabToMove, gZenWorkspaces.changeWorkspaceWithID(targetWorkspaceId);
-            else
-              gBrowser.selectedTab = tabToMove;
-          },
-          condition: () => {
-            let currentTab = gBrowser.selectedTab;
-            return currentTab && !currentTab.hasAttribute("zen-essential") && currentTab.group !== folder;
-          },
-          tags: ["folder", "move", "tab", folder.label.toLowerCase()]
-        });
-      });
-    return commands;
-  }
-  function generateWorkspaceMoveCommands() {
-    if (!window.gZenWorkspaces?.workspaceEnabled)
-      return [];
-    let commands = [], workspacesData = window.gZenWorkspaces.getWorkspaces();
-    if (!isNotEmptyTab())
-      return [];
-    if (!workspacesData)
-      return [];
-    let activeTab = gBrowser.selectedTab;
-    if (activeTab && !activeTab.hasAttribute("zen-essential"))
-      workspacesData.forEach((workspace) => {
-        if (activeTab.getAttribute("zen-workspace-id") === workspace.uuid)
-          return;
-        commands.push({
-          key: `workspace-move-active-to:${workspace.uuid}`,
-          label: `Move Tab to Workspace: ${workspace.name}`,
-          command: () => {
-            let tabToMove = gBrowser.selectedTab;
-            if (tabToMove)
-              gZenWorkspaces.moveTabToWorkspace(tabToMove, workspace.uuid), gZenWorkspaces.switchTabIfNeeded(tabToMove);
-          },
-          condition: () => !!gBrowser.selectedTab,
-          tags: ["workspace", "move", "tab", workspace.name.toLowerCase()]
-        });
-      });
-    return commands;
-  }
   async function generateCustomCommands() {
     let { customCommands } = await Storage.loadSettings();
     if (!customCommands || customCommands.length === 0)
@@ -1753,14 +2274,7 @@
           try {
             let approvedHashes = await loadApprovedHashes(), codeHash = await hmacCode(cmd.code);
             if (!approvedHashes[codeHash]) {
-              let preview = cmd.code.length > 200 ? cmd.code.slice(0, 200) + "…" : cmd.code;
-              if (!window.confirm(`Run custom JS command "${cmd.name}"?
-
-This will execute the following JavaScript in the browser:
-
-${preview}
-
-Only proceed if you trust the source of this command. You will not be asked again unless the code changes.`))
+              if (!await confirmCodeExecution({ name: cmd.name, code: cmd.code }))
                 return;
               await trustHash(codeHash);
             }
@@ -1799,22 +2313,373 @@ Only proceed if you trust the source of this command. You will not be asked agai
       };
     });
   }
+  // command-palette/dynamic-commands/quick-split.js
+  var QUICK_SPLIT_CURRENT = "<current-tab>";
+  function parseQuickSplit(input) {
+    if (typeof input !== "string")
+      return null;
+    let trimmed = input.trim();
+    if (!trimmed)
+      return null;
+    if (trimmed.startsWith("+")) {
+      let term = trimmed.slice(1).trim();
+      if (!term)
+        return null;
+      if (/(\s*\|\s*|\s+-\s+|\s+_\s+)/.test(term))
+        return { kind: "invalid" };
+      return { kind: "glance", term };
+    }
+    let rest = trimmed, prefixCurrent = !1, suffixCurrent = !1, separators = [], leading = rest.match(/^(?:\|\s*|-\s+|_\s+)/);
+    if (leading)
+      prefixCurrent = !0, separators.push(leading[0].trim()), rest = rest.slice(leading[0].length).trim();
+    let trailing = rest.match(/(?:\s*\|\s*|\s+[-_]\s*)$/);
+    if (trailing)
+      suffixCurrent = !0, separators.push(trailing[0].trim()), rest = rest.slice(0, -trailing[0].length).trim();
+    if (prefixCurrent && suffixCurrent)
+      return null;
+    if (!rest)
+      return null;
+    let tokens = rest.split(/(\s*\|\s*|\s+-\s+|\s+_\s+)/), parts = [];
+    if (tokens.forEach((token, index) => {
+      if (index % 2 === 0) {
+        let part = token.trim();
+        if (part)
+          parts.push(part);
+      } else
+        separators.push(token.trim());
+    }), prefixCurrent)
+      parts.unshift(QUICK_SPLIT_CURRENT);
+    if (suffixCurrent)
+      parts.push(QUICK_SPLIT_CURRENT);
+    if (parts.length < 2)
+      return null;
+    let hasVertical = separators.some((s) => s === "|"), hasHorizontal = separators.some((s) => s === "-" || s === "_");
+    return { kind: "split", parts, gridType: hasVertical && hasHorizontal ? "grid" : hasVertical ? "vsep" : "hsep" };
+  }
+  function describeQuickSplit(parsed) {
+    if (!parsed)
+      return "";
+    if (parsed.kind === "glance")
+      return `Open glance: ${parsed.term}`;
+    if (parsed.kind === "invalid")
+      return "Glance (+) supports a single site only";
+    let layout = parsed.gridType === "vsep" ? "side-by-side" : parsed.gridType === "hsep" ? "stacked" : "grid", names = parsed.parts.map((p) => p === QUICK_SPLIT_CURRENT ? "current tab" : p), summary = `Open ${layout} split (${names.length}): ${names.join(", ")}`;
+    if (summary.length > 100)
+      summary = summary.slice(0, 97) + "...";
+    return summary;
+  }
+  async function getQuickSplitKeywords() {
+    let { quickSplitKeywords } = await Storage.loadSettings();
+    if (!quickSplitKeywords || typeof quickSplitKeywords !== "object")
+      return {};
+    return quickSplitKeywords;
+  }
+  function quickSplitLooksLikeUrl(part) {
+    if (!part || /\s/.test(part))
+      return !1;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(part))
+      return !0;
+    if (/^localhost(:\d+)?(\/\S*)?$/i.test(part))
+      return !0;
+    return /^[\w-]+(\.[\w-]+)+(:\d+)?(\/\S*)?$/.test(part);
+  }
+  function quickSplitNormalizeUrl(value) {
+    if (/^localhost(:\d+)?(\/\S*)?$/i.test(value))
+      return `http://${value}`;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(value))
+      return value;
+    return `https://${value}`;
+  }
+  function quickSplitLuckyUrl(query, engineName = "") {
+    if (/google/i.test(engineName))
+      return `https://www.google.com/search?q=${encodeURIComponent(query)}&btnI=1`;
+    return `https://duckduckgo.com/?q=!ducky+${encodeURIComponent(query)}`;
+  }
+  async function resolveQuickSplitPart(part) {
+    let trimmed = part.trim();
+    if (!trimmed)
+      return null;
+    let keywordUrl = (await getQuickSplitKeywords())[trimmed.toLowerCase()];
+    if (keywordUrl)
+      return quickSplitNormalizeUrl(keywordUrl);
+    if (quickSplitLooksLikeUrl(trimmed))
+      return quickSplitNormalizeUrl(trimmed);
+    let saved = (PREFS2.quickSplitSearchEngine || "").trim();
+    if (!saved || /^duckduckgo lucky$/i.test(saved))
+      return quickSplitLuckyUrl(trimmed, saved);
+    if (/^google lucky$/i.test(saved))
+      return quickSplitLuckyUrl(trimmed, saved);
+    try {
+      let submission = (await getEngineByName(saved)).getSubmission(trimmed);
+      if (submission?.uri?.spec)
+        return submission.uri.spec;
+    } catch (e) {
+      PREFS2.debugError(`Failed to build search URL for "${trimmed}".`, e);
+    }
+    return quickSplitLuckyUrl(trimmed);
+  }
+  async function executeQuickSplit(parsed) {
+    if (!parsed)
+      return !1;
+    if (parsed.kind === "invalid")
+      return showToast({
+        title: "Quick Split",
+        description: "Glance (+) supports a single site only, no split characters."
+      }), !1;
+    if (parsed.kind === "glance") {
+      let url = await resolveQuickSplitPart(parsed.term);
+      if (!url)
+        return !1;
+      return await openLink(url, "glance"), !0;
+    }
+    if (parsed.parts.length === 2 && parsed.parts.includes(QUICK_SPLIT_CURRENT) && parsed.gridType !== "grid") {
+      let other = parsed.parts.find((p) => p !== QUICK_SPLIT_CURRENT), url = await resolveQuickSplitPart(other);
+      if (!url)
+        return !1;
+      return await openLink(url, parsed.gridType), !0;
+    }
+    let urls = [];
+    for (let part of parsed.parts) {
+      if (part === QUICK_SPLIT_CURRENT) {
+        urls.push(null);
+        continue;
+      }
+      let url = await resolveQuickSplitPart(part);
+      if (url)
+        urls.push(url);
+    }
+    if (urls.length < 2)
+      return showToast({ title: "Quick Split", description: "Need at least two valid sites to split." }), !1;
+    try {
+      let currentTab = gBrowser.selectedTab, tabs = [];
+      for (let url of urls) {
+        if (url === null) {
+          tabs.push(currentTab);
+          continue;
+        }
+        await openTrustedLinkIn(url, "tab"), tabs.push(gBrowser.selectedTab);
+      }
+      if (window.gZenViewSplitter && tabs.length >= 2)
+        gZenViewSplitter.splitTabs(tabs, parsed.gridType);
+      return !0;
+    } catch (e) {
+      return PREFS2.debugError("Failed to open split view.", e), !1;
+    }
+  }
+  function getQuickSplitCommand(query) {
+    if (!PREFS2.loadQuickSplit)
+      return null;
+    let parsed = parseQuickSplit(query);
+    if (!parsed)
+      return null;
+    let label = describeQuickSplit(parsed);
+    if (parsed.kind === "split" && parsed.parts.includes(QUICK_SPLIT_CURRENT) && gBrowser?.selectedTab?.splitView)
+      label = label.replace("side-by-side split", "grid split").replace("stacked split", "grid split");
+    return {
+      key: "quick-split:open",
+      label,
+      command: async () => {
+        await executeQuickSplit(parsed);
+      },
+      icon: parsed.kind === "glance" ? textToSvgDataUrl("+") : "chrome://browser/skin/zen-icons/split.svg",
+      tags: ["quick", "split", "glance", "side-by-side", "stacked", "grid"],
+      transient: !0
+    };
+  }
+  // utils/fuzzy.js
+  function calculateFuzzyScore(target, query) {
+    if (!target || !query)
+      return 0;
+    let targetLower = target.toLowerCase(), queryLower = query.toLowerCase(), targetLen = target.length, queryLen = query.length;
+    if (queryLen > targetLen)
+      return 0;
+    if (queryLen === 0)
+      return 0;
+    if (targetLower === queryLower)
+      return 200;
+    if (targetLower.startsWith(queryLower))
+      return 100 + queryLen;
+    if (targetLower.split(/[\s-_]+/).map((word) => word[0]).join("") === queryLower)
+      return 90 + queryLen;
+    let score = 0, queryIndex = 0, lastMatchIndex = -1, consecutiveMatches = 0;
+    for (let targetIndex = 0;targetIndex < targetLen; targetIndex++)
+      if (queryIndex < queryLen && targetLower[targetIndex] === queryLower[queryIndex]) {
+        let bonus = 10;
+        if (targetIndex === 0 || [" ", "-", "_"].includes(targetLower[targetIndex - 1]))
+          bonus += 15;
+        if (lastMatchIndex === targetIndex - 1)
+          consecutiveMatches++, bonus += 20 * consecutiveMatches;
+        else
+          consecutiveMatches = 0;
+        if (lastMatchIndex !== -1) {
+          let distance = targetIndex - lastMatchIndex;
+          bonus -= Math.min(distance - 1, 10);
+        }
+        score += bonus, lastMatchIndex = targetIndex, queryIndex++;
+      }
+    return queryIndex === queryLen ? score : 0;
+  }
+  function bestFuzzyScore(targets, query) {
+    let cleanQuery = (query || "").trim();
+    if (!cleanQuery)
+      return 1;
+    let best = 0;
+    for (let target of targets || []) {
+      if (!target)
+        continue;
+      let score = calculateFuzzyScore(target, cleanQuery);
+      if (score > best)
+        best = score;
+      if (best >= 200)
+        break;
+    }
+    return best;
+  }
+  function fuzzyFilterSort(items, query, getTexts) {
+    let cleanQuery = (query || "").trim();
+    if (!cleanQuery)
+      return [...items];
+    return items.map((item) => {
+      let texts = getTexts(item), list = Array.isArray(texts) ? texts : [texts];
+      return { item, score: bestFuzzyScore(list, cleanQuery) };
+    }).filter((entry) => entry.score > 0).sort((a, b) => b.score - a.score).map((entry) => entry.item);
+  }
 
-  // utils/parse.js
-  var parseElement = (elementString, type = "html") => {
-    if (type === "xul")
-      return window.MozXULElement.parseXULToFragment(elementString).firstChild;
-    let element = new DOMParser().parseFromString(elementString, "text/html");
-    if (element.body.children.length)
-      element = element.body.firstChild;
-    else
-      element = element.head.firstChild;
-    return element;
-  }, escapeXmlAttribute = (str) => {
-    if (typeof str !== "string")
-      return str;
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
-  };
+  // utils/combobox.js
+  function createCombobox({
+    id = "",
+    extraClass = "",
+    items = [],
+    value = "",
+    placeholder = "Select…",
+    searchable = !0,
+    searchPlaceholder = "Search…",
+    attrs = {}
+  } = {}) {
+    let attrString = Object.entries(attrs).map(([key, val]) => `${key}="${escapeXmlAttribute(String(val))}"`).join(" "), root = parseElement(`<div class="zenux-combobox ${extraClass}"${id ? ` id="${id}"` : ""}${attrString ? ` ${attrString}` : ""} tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+      <span class="zenux-combobox-label"></span>
+    </div>`), iconEl = xulImage("", "zenux-combobox-icon"), markerEl = xulImage("chrome://global/skin/icons/arrow-down-12.svg", "zenux-combobox-marker"), popup = parseElement(`<div class="zenux-combobox-popup" hidden>
+      <input type="text" class="zenux-combobox-search zenux-input" placeholder="${escapeXmlAttribute(searchPlaceholder)}" aria-label="${escapeXmlAttribute(searchPlaceholder)}" />
+      <div class="zenux-combobox-list" role="listbox"></div>
+    </div>`), labelEl = root.querySelector(".zenux-combobox-label");
+    root.insertBefore(iconEl, labelEl), root.appendChild(markerEl);
+    let searchEl = popup.querySelector(".zenux-combobox-search"), listEl = popup.querySelector(".zenux-combobox-list"), currentItems = [], currentValue = value ?? "", isOpen = !1;
+    function syncDisplay() {
+      let selected = currentItems.find((item) => item.value === currentValue);
+      if (selected)
+        if (labelEl.textContent = selected.label, labelEl.classList.remove("is-placeholder"), selected.image)
+          iconEl.setAttribute("src", selected.image), iconEl.style.display = "";
+        else
+          iconEl.removeAttribute("src"), iconEl.style.display = "none";
+      else
+        labelEl.textContent = placeholder, labelEl.classList.add("is-placeholder"), iconEl.removeAttribute("src"), iconEl.style.display = "none";
+      root.setAttribute("aria-label", labelEl.textContent);
+    }
+    function syncListSelection() {
+      listEl.querySelectorAll(".zenux-combobox-item").forEach((el) => {
+        el.setAttribute("aria-selected", String(el.dataset.value === currentValue));
+      });
+    }
+    function visibleItems() {
+      return [...listEl.querySelectorAll(".zenux-combobox-item:not([hidden])")];
+    }
+    function highlight(el) {
+      if (listEl.querySelectorAll(".zenux-combobox-item.is-highlighted").forEach((item) => {
+        item.classList.remove("is-highlighted");
+      }), el)
+        el.classList.add("is-highlighted"), el.scrollIntoView({ block: "nearest" });
+    }
+    function renderList(filter = "") {
+      listEl.innerHTML = "";
+      let firstVisible = null, matches = fuzzyFilterSort(currentItems, filter, (item) => [
+        item.label || "",
+        item.value || ""
+      ]);
+      for (let item of matches) {
+        let itemEl = parseElement(`<div class="zenux-combobox-item" role="option" data-value="${escapeXmlAttribute(item.value)}" aria-selected="${item.value === currentValue}">
+          <span></span>
+        </div>`);
+        if (itemEl.insertBefore(xulImage(item.image || "", "zenux-combobox-item-icon"), itemEl.firstChild), !item.image) {
+          let itemIcon = itemEl.querySelector(".zenux-combobox-item-icon");
+          if (itemIcon)
+            itemIcon.style.display = "none";
+        }
+        itemEl.querySelector("span").textContent = item.label, itemEl.addEventListener("click", () => select(item.value)), itemEl.addEventListener("mousemove", () => highlight(itemEl)), listEl.appendChild(itemEl), firstVisible ??= itemEl;
+      }
+      if (!firstVisible)
+        listEl.appendChild(parseElement('<div class="zenux-combobox-no-results">No results</div>'));
+      highlight(firstVisible);
+    }
+    function positionPopup() {
+      let rect = root.getBoundingClientRect();
+      popup.style.minWidth = `${rect.width}px`, popup.style.maxWidth = `${Math.max(rect.width, 320)}px`, popup.hidden = !1;
+      let height = Math.min(popup.offsetHeight, 280), below = window.innerHeight - rect.bottom - 8;
+      if (popup.style.left = `${Math.min(rect.left, window.innerWidth - popup.offsetWidth - 8)}px`, below >= height || below >= rect.top)
+        popup.style.top = `${rect.bottom + 4}px`, popup.style.bottom = "", popup.style.maxHeight = `${Math.min(280, below)}px`;
+      else
+        popup.style.bottom = `${window.innerHeight - rect.top + 4}px`, popup.style.top = "", popup.style.maxHeight = `${Math.min(280, rect.top - 8)}px`;
+    }
+    function open() {
+      if (isOpen)
+        return;
+      if (isOpen = !0, root.setAttribute("aria-expanded", "true"), searchEl.value = "", renderList(""), document.documentElement.appendChild(popup), positionPopup(), searchEl.hidden)
+        root.focus();
+      else
+        searchEl.focus();
+    }
+    function close(refocus = !1) {
+      if (!isOpen)
+        return;
+      if (isOpen = !1, root.setAttribute("aria-expanded", "false"), popup.remove(), refocus)
+        root.focus();
+    }
+    function select(nextValue) {
+      currentValue = nextValue ?? "", syncDisplay(), syncListSelection(), close(!0), root.dispatchEvent(new Event("command", { bubbles: !0 }));
+    }
+    return root.addEventListener("click", (event) => {
+      if (event.target === searchEl)
+        return;
+      if (isOpen)
+        close();
+      else
+        open();
+    }), root.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " " || event.key === "ArrowDown")
+        event.preventDefault(), open();
+    }), searchEl.addEventListener("input", () => renderList(searchEl.value)), searchEl.addEventListener("keydown", (event) => {
+      let items = visibleItems(), index = items.findIndex((el) => el.classList.contains("is-highlighted"));
+      if (event.key === "Escape")
+        event.preventDefault(), close(!0);
+      else if (event.key === "ArrowDown")
+        event.preventDefault(), highlight(items[(index + 1) % items.length] ?? null);
+      else if (event.key === "ArrowUp")
+        event.preventDefault(), highlight(items[(index - 1 + items.length) % items.length] ?? null);
+      else if (event.key === "Enter") {
+        event.preventDefault();
+        let target = items[index] ?? items[0];
+        if (target)
+          select(target.dataset.value);
+      }
+    }), document.addEventListener("pointerdown", (event) => {
+      if (isOpen && !popup.contains(event.target) && !root.contains(event.target))
+        close();
+    }, !0), document.addEventListener("scroll", (event) => {
+      if (isOpen && !popup.contains(event.target))
+        close();
+    }, !0), window.addEventListener("resize", () => close()), document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && isOpen)
+        close(!0);
+    }), Object.defineProperty(root, "value", {
+      get: () => currentValue,
+      set: (next) => {
+        currentValue = next ?? "", syncDisplay(), syncListSelection();
+      },
+      configurable: !0
+    }), root.setItems = (nextItems) => {
+      if (currentItems = nextItems ?? [], searchEl.hidden = !searchable, syncDisplay(), isOpen)
+        renderList(searchEl.value);
+    }, root.setItems(items), root;
+  }
 
   // utils/keyboard.js
   function eventToShortcutSignature(event) {
@@ -1844,7 +2709,8 @@ Only proceed if you trust the source of this command. You will not be asked agai
   function shortcutStringToSignature(shortcutStr) {
     if (!shortcutStr)
       return "";
-    return shortcutStr.toLowerCase().replace(/control/g, "ctrl").replace(/option/g, "alt").split("+").map((s) => normalizeKeyName(s.trim())).join("+");
+    let parts = shortcutStr.toLowerCase().replace(/control/g, "ctrl").replace(/option/g, "alt").split("+").map((s) => normalizeKeyName(s.trim())), rank = (p) => p === "ctrl" ? 0 : p === "alt" ? 1 : p === "shift" ? 2 : p === "meta" ? 3 : 99, mods = parts.filter((p) => rank(p) !== 99).sort((a, b) => rank(a) - rank(b)), keys = parts.filter((p) => rank(p) === 99);
+    return [...mods, ...keys].join("+");
   }
   function parseStringToShortcut(shortcutStr) {
     let parts = shortcutStr.toLowerCase().split("+").map((p) => p.trim()), keyPart = parts.pop();
@@ -1897,8 +2763,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
     return { hasConflict: !1 };
   }
   function handleKeyDown(event) {
-    let t = event.target;
-    if (t && (t.tagName === "input" || t.tagName === "textarea" || t.isContentEditable))
+    if (event.target?.closest?.(".zenux-shortcut-input, .zenCKSOption-input"))
       return;
     let signature = eventToShortcutSignature(event), shortcut = _shortcuts.get(signature);
     if (shortcut)
@@ -1936,8 +2801,387 @@ Only proceed if you trust the source of this command. You will not be asked agai
     };
   }
 
+  // utils/settings-modal.js
+  var MODIFIER_KEYS = ["Control", "Alt", "Shift", "Meta"];
+  var prefId = (prefKey) => `pref-${String(prefKey).toLowerCase().replace(/_/g, "-")}`;
+
+  class ZenuxSettings {
+    constructor(prefsClass) {
+      this.PREFS = prefsClass, this.values = {}, this._shortcutTarget = null, this._boundShortcutKeyDown = this._handleShortcutKeyDown.bind(this), this._boundEscapeToClose = null, this._onClose = null;
+    }
+    static shell({
+      title,
+      bodyHTML,
+      tabs = null,
+      closeId,
+      saveId,
+      overlayClass = "",
+      overlayId = "",
+      modalClass = ""
+    }) {
+      let tabsHTML = tabs ? `<div class="zenux-settings-tabs" role="tablist">${tabs.map((tab) => `<button class="zenux-settings-tab" role="tab" data-tab="${escapeXmlAttribute(tab.id)}">${tab.icon ? `<img class="zenux-settings-tab-icon" src="${escapeXmlAttribute(tab.icon)}" />` : ""}${escapeXmlAttribute(tab.label)}</button>`).join("")}</div>` : "";
+      return `
+      <div class="zenux-settings-overlay ${escapeXmlAttribute(overlayClass)}"${overlayId ? ` id="${escapeXmlAttribute(overlayId)}"` : ""}>
+        <div class="zenux-settings-modal ${escapeXmlAttribute(modalClass)}" role="dialog" aria-label="${escapeXmlAttribute(title)}">
+          <div class="zenux-settings-header">
+            <h3 class="zenux-settings-title">${escapeXmlAttribute(title)}</h3>
+            <div class="zenux-settings-actions">
+              <button id="${escapeXmlAttribute(closeId)}" class="zenux-btn-ghost" data-close>Close</button>
+              <button id="${escapeXmlAttribute(saveId)}" class="zenux-btn-primary" data-save>Save</button>
+            </div>
+          </div>
+          ${tabsHTML}
+          <div class="zenux-settings-content">
+            ${bodyHTML}
+          </div>
+        </div>
+      </div>
+    `;
+    }
+    static accordionSection({
+      title,
+      icon = "",
+      expanded = !0,
+      resetPrefs = [],
+      before = "",
+      body = "",
+      after = "",
+      id = ""
+    }) {
+      let reset = resetPrefs.filter(Boolean).join(",");
+      return `
+      <section class="zenux-settings-section zenux-settings-accordion" data-expanded="${expanded ? "true" : "false"}"${id ? ` id="${escapeXmlAttribute(id)}"` : ""}>
+        <h4 class="zenux-settings-section-head" data-accordion-head>
+          ${icon ? `<img class="zenux-settings-section-icon" src="${escapeXmlAttribute(icon)}" />` : ""}
+          <span class="zenux-settings-section-title">${escapeXmlAttribute(title)}</span>
+          ${reset ? `<button class="zenux-settings-reset zenux-icon-btn" data-reset-prefs="${escapeXmlAttribute(reset)}" title="Reset section" aria-label="Reset ${escapeXmlAttribute(title)}">
+              <img src="chrome://global/skin/icons/reload.svg" />
+            </button>` : ""}
+          <img class="zenux-settings-chevron" src="chrome://global/skin/icons/arrow-down-12.svg" />
+        </h4>
+        <div class="zenux-settings-accordion-body">
+          <div class="zenux-settings-accordion-inner">
+            ${before}
+            ${body}
+            ${after}
+          </div>
+        </div>
+      </section>
+    `;
+    }
+    static checkboxRow(label, prefKey, { id = prefId(prefKey), checked = !1 } = {}) {
+      return `
+      <div class="zenux-setting-item">
+        <label for="${escapeXmlAttribute(id)}">${escapeXmlAttribute(label)}</label>
+        <input type="checkbox" id="${escapeXmlAttribute(id)}" data-pref="${escapeXmlAttribute(prefKey)}"${checked ? " checked" : ""} />
+      </div>
+    `;
+    }
+    static numberRow(label, prefKey, { min, max, step, tooltip, value, id = prefId(prefKey) } = {}) {
+      let info = tooltip ? ZenuxSettings.infoIcon(tooltip) : "", attrs = [
+        min !== void 0 ? `min="${escapeXmlAttribute(String(min))}"` : "",
+        max !== void 0 ? `max="${escapeXmlAttribute(String(max))}"` : "",
+        step !== void 0 ? `step="${escapeXmlAttribute(String(step))}"` : "",
+        value !== void 0 && value !== null ? `value="${escapeXmlAttribute(String(value))}"` : ""
+      ].filter(Boolean).join(" ");
+      return `
+      <div class="zenux-setting-item">
+        <label for="${escapeXmlAttribute(id)}">${escapeXmlAttribute(label)} ${info}</label>
+        <input type="number" class="zenux-input" id="${escapeXmlAttribute(id)}" data-pref="${escapeXmlAttribute(prefKey)}" ${attrs} />
+      </div>
+    `;
+    }
+    static textRow(label, prefKey, { placeholder = "", password = !1, maxlength, value, id = prefId(prefKey) } = {}) {
+      return `
+      <div class="zenux-setting-item">
+        <label for="${escapeXmlAttribute(id)}">${escapeXmlAttribute(label)}</label>
+        <input type="${password ? "password" : "text"}" class="zenux-input" id="${escapeXmlAttribute(id)}" data-pref="${escapeXmlAttribute(prefKey)}" placeholder="${escapeXmlAttribute(placeholder)}"${maxlength ? ` maxlength="${maxlength}"` : ""}${value !== void 0 && value !== null ? ` value="${escapeXmlAttribute(String(value))}"` : ""} />
+      </div>
+    `;
+    }
+    static textareaRow(label, prefKey, { placeholder = "", rows = 3, value, id = prefId(prefKey) } = {}) {
+      return `
+      <div class="zenux-setting-item zenux-setting-item-stacked">
+        <label for="${escapeXmlAttribute(id)}">${escapeXmlAttribute(label)}</label>
+        <textarea class="zenux-input" id="${escapeXmlAttribute(id)}" data-pref="${escapeXmlAttribute(prefKey)}" rows="${rows}" placeholder="${escapeXmlAttribute(placeholder)}">${value !== void 0 && value !== null ? escapeXmlAttribute(String(value)) : ""}</textarea>
+      </div>
+    `;
+    }
+    static selectRow(label, prefKey, options = {}, { id = prefId(prefKey), value } = {}) {
+      let optionsHTML = Object.entries(options).map(([optionValue, optionLabel]) => `<option value="${escapeXmlAttribute(optionValue)}"${value !== void 0 && value !== null && String(optionValue) === String(value) ? " selected" : ""}>${escapeXmlAttribute(optionLabel)}</option>`).join("");
+      return `
+      <div class="zenux-setting-item">
+        <label for="${escapeXmlAttribute(id)}">${escapeXmlAttribute(label)}</label>
+        <select id="${escapeXmlAttribute(id)}" data-pref="${escapeXmlAttribute(prefKey)}">
+          ${optionsHTML}
+        </select>
+      </div>
+    `;
+    }
+    static shortcutRow(label, prefKey, { id = prefId(prefKey), value } = {}) {
+      return `
+      <div class="zenux-setting-item">
+        <label for="${escapeXmlAttribute(id)}">${escapeXmlAttribute(label)}</label>
+        <input type="text" id="${escapeXmlAttribute(id)}" data-pref="${escapeXmlAttribute(prefKey)}" readonly placeholder="Click to set" class="zenux-input zenux-shortcut-input"${value ? ` value="${escapeXmlAttribute(String(value))}"` : ""} />
+      </div>
+    `;
+    }
+    static infoIcon(tooltip) {
+      return `<span class="zenux-settings-info" data-tooltip="${escapeXmlAttribute(tooltip)}"><img src="chrome://global/skin/icons/info.svg" /></span>`;
+    }
+    prefRow(item) {
+      let current = this.PREFS.getPref(item.key);
+      switch (item.type || "bool") {
+        case "bool":
+        case "checkbox":
+          return ZenuxSettings.checkboxRow(item.label, item.key, {
+            id: item.id,
+            checked: Boolean(current)
+          });
+        case "number":
+          return ZenuxSettings.numberRow(item.label, item.key, {
+            id: item.id,
+            value: current ?? "",
+            min: item.min,
+            max: item.max,
+            step: item.step,
+            tooltip: item.tooltip
+          });
+        case "password":
+          return ZenuxSettings.textRow(item.label, item.key, {
+            id: item.id,
+            value: current ?? "",
+            placeholder: item.placeholder,
+            maxlength: item.maxlength,
+            password: !0
+          });
+        case "textarea":
+          return ZenuxSettings.textareaRow(item.label, item.key, {
+            id: item.id,
+            value: current ?? "",
+            placeholder: item.placeholder,
+            rows: item.rows
+          });
+        case "select":
+          return ZenuxSettings.selectRow(item.label, item.key, item.options || {}, {
+            id: item.id,
+            value: current ?? ""
+          });
+        case "shortcut":
+          return ZenuxSettings.shortcutRow(item.label, item.key, {
+            id: item.id,
+            value: getPrettyShortcut(current)
+          });
+        case "char":
+        case "text":
+        default:
+          return ZenuxSettings.textRow(item.label, item.key, {
+            id: item.id,
+            value: current ?? "",
+            placeholder: item.placeholder,
+            maxlength: item.maxlength
+          });
+      }
+    }
+    prefAccordion({ title, icon = "", items, expanded = !0, resetPrefs, before = "", after = "" }) {
+      return ZenuxSettings.accordionSection({
+        title,
+        icon,
+        expanded,
+        resetPrefs: resetPrefs ?? items.map((item) => item.key),
+        before,
+        body: items.map((item) => this.prefRow(item)).join(""),
+        after
+      });
+    }
+    controlValue(control) {
+      if (control.type === "checkbox")
+        return control.checked;
+      if (control.type === "number") {
+        let parsed = Number(control.value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+      return control.value;
+    }
+    applyValueToControl(control, value) {
+      if (control.type === "checkbox")
+        control.checked = Boolean(value);
+      else if (typeof control.setItems === "function" || control.classList.contains("zenux-combobox"))
+        control.value = value ?? "";
+      else
+        control.value = value ?? "";
+    }
+    syncFromPrefs(root) {
+      root.querySelectorAll("[data-pref]").forEach((control) => {
+        let prefKey = control.dataset.pref;
+        if (control.classList.contains("zenux-shortcut-input"))
+          control.value = getPrettyShortcut(this.PREFS.getPref(prefKey));
+        else
+          this.applyValueToControl(control, this.PREFS.getPref(prefKey));
+        this.values[prefKey] = this.PREFS.getPref(prefKey);
+      });
+    }
+    saveToPrefs() {
+      for (let [prefKey, value] of Object.entries(this.values))
+        try {
+          this.PREFS.setPref(prefKey, value);
+        } catch (e) {
+          this.PREFS.debugError(`Error saving pref for ${prefKey}:`, e);
+        }
+    }
+    resetPrefsIn(root, prefsToReset, onPrefChange) {
+      for (let prefKey of prefsToReset) {
+        if (!prefKey)
+          continue;
+        let defVal = this.PREFS.defaultValues[prefKey], control = root.querySelector(`[data-pref="${prefKey}"]`);
+        if (defVal === void 0) {
+          if (!control)
+            continue;
+          defVal = control.type === "checkbox" ? !1 : control.type === "number" ? 0 : "";
+        }
+        if (this.values[prefKey] = defVal, control)
+          if (control.classList.contains("zenux-shortcut-input"))
+            control.value = getPrettyShortcut(defVal);
+          else
+            this.applyValueToControl(control, defVal);
+        if (typeof onPrefChange === "function")
+          onPrefChange(prefKey, defVal);
+      }
+    }
+    attachAccordion(root) {
+      root.querySelectorAll(".zenux-settings-accordion").forEach((section) => {
+        section.addEventListener("click", (event) => {
+          if (event.target.closest("[data-reset-prefs]"))
+            return;
+          if (section.dataset.expanded === "false") {
+            section.dataset.expanded = "true";
+            return;
+          }
+          if (event.target.closest("[data-accordion-head]"))
+            section.dataset.expanded = "false";
+        });
+      });
+    }
+    attachResetButtons(root, onPrefChange) {
+      root.querySelectorAll("[data-reset-prefs]").forEach((btn) => {
+        btn.addEventListener("click", (event) => {
+          event.stopPropagation(), this.resetPrefsIn(root, String(btn.dataset.resetPrefs || "").split(","), onPrefChange);
+        });
+      });
+    }
+    attachPrefTracking(root, onPrefChange) {
+      root.querySelectorAll("[data-pref]").forEach((control) => {
+        let prefKey = control.dataset.pref;
+        if (control.classList.contains("zenux-shortcut-input"))
+          return;
+        if (control.classList.contains("zenux-combobox"))
+          control.addEventListener("command", (event) => {
+            if (this.values[prefKey] = event.target.value, typeof onPrefChange === "function")
+              onPrefChange(prefKey, this.values[prefKey]);
+          });
+        else
+          control.addEventListener("change", (event) => {
+            if (this.values[prefKey] = this.controlValue(event.target), typeof onPrefChange === "function")
+              onPrefChange(prefKey, this.values[prefKey]);
+          });
+      });
+    }
+    attachDismiss(overlay, onClose) {
+      this._onClose = onClose, overlay.addEventListener("click", (event) => {
+        if (event.target === overlay)
+          this.close();
+      }), overlay.querySelectorAll("[data-close]").forEach((btn) => {
+        btn.addEventListener("click", () => this.close());
+      }), this._boundEscapeToClose = (event) => {
+        if (event.key === "Escape")
+          this.close();
+      }, window.addEventListener("keydown", this._boundEscapeToClose);
+    }
+    close() {
+      if (window.removeEventListener("keydown", this._boundShortcutKeyDown, !0), this._boundEscapeToClose)
+        window.removeEventListener("keydown", this._boundEscapeToClose), this._boundEscapeToClose = null;
+      if (this._shortcutTarget = null, typeof this._onClose === "function") {
+        let callback = this._onClose;
+        this._onClose = null, callback();
+      }
+    }
+    switchTab(root, tabId) {
+      root.querySelectorAll("[data-tab-content]").forEach((el) => {
+        el.hidden = el.dataset.tabContent !== tabId;
+      }), root.querySelectorAll("[data-tab]").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.tab === tabId);
+      });
+    }
+    attachTabs(root, initialTab = null) {
+      let tabs = [...root.querySelectorAll("[data-tab]")];
+      if (tabs.forEach((tab) => {
+        tab.addEventListener("click", () => this.switchTab(root, tab.dataset.tab));
+      }), initialTab)
+        this.switchTab(root, initialTab);
+      else if (tabs.length)
+        this.switchTab(root, tabs[0].dataset.tab);
+    }
+    attachShortcutInputs(root) {
+      root.querySelectorAll(".zenux-shortcut-input[data-pref]").forEach((input) => {
+        input.addEventListener("focus", (event) => {
+          this._shortcutTarget = event.target, event.target.classList.add("is-recording"), event.target.placeholder = "Press keys...", window.addEventListener("keydown", this._boundShortcutKeyDown, !0);
+        }), input.addEventListener("blur", () => this._stopShortcutRecording()), input.addEventListener("keydown", (event) => {
+          event.preventDefault(), event.stopPropagation();
+        });
+      });
+    }
+    _stopShortcutRecording() {
+      if (!this._shortcutTarget)
+        return;
+      this._shortcutTarget.classList.remove("is-recording"), this._shortcutTarget.placeholder = "Click to set", this._shortcutTarget = null, window.removeEventListener("keydown", this._boundShortcutKeyDown, !0);
+    }
+    _handleShortcutKeyDown(event) {
+      if (!this._shortcutTarget)
+        return;
+      event.preventDefault(), event.stopPropagation();
+      let target = this._shortcutTarget, prefKey = target.dataset.pref;
+      if (event.key === "Escape") {
+        target.value = getPrettyShortcut(this.values[prefKey] ?? this.PREFS.getPref(prefKey)), this._stopShortcutRecording(), target.blur();
+        return;
+      }
+      if (event.key === "Backspace" || event.key === "Delete") {
+        target.value = "", this.values[prefKey] = "", this._stopShortcutRecording(), target.blur();
+        return;
+      }
+      if (MODIFIER_KEYS.includes(event.key))
+        return;
+      let shortcut = eventToShortcutSignature(event);
+      target.value = getPrettyShortcut(shortcut), this.values[prefKey] = shortcut, this._stopShortcutRecording(), target.blur();
+    }
+  }
+  function attachStandaloneShortcutRecorder(input, { initialValue = "", onCommit, onClearConflict } = {}) {
+    let boundKeyDown = (event) => {
+      if (event.preventDefault(), event.stopPropagation(), event.key === "Escape") {
+        input.value = getPrettyShortcut(initialValue), stop(), input.blur();
+        return;
+      }
+      if (event.key === "Backspace" || event.key === "Delete") {
+        input.value = "", onCommit(""), stop(), input.blur();
+        return;
+      }
+      if (MODIFIER_KEYS.includes(event.key))
+        return;
+      let shortcut = eventToShortcutSignature(event);
+      input.value = getPrettyShortcut(shortcut), onCommit(shortcut), stop(), input.blur();
+    };
+    function stop() {
+      if (input.classList.remove("is-recording"), input.placeholder = input.dataset.placeholder || "Set Shortcut", window.removeEventListener("keydown", boundKeyDown, !0), typeof onClearConflict === "function")
+        onClearConflict();
+    }
+    return input.addEventListener("focus", () => {
+      input.classList.add("is-recording"), input.placeholder = "Press keys...", window.addEventListener("keydown", boundKeyDown, !0);
+    }), input.addEventListener("keydown", (event) => {
+      event.preventDefault(), event.stopPropagation();
+    }), { stop };
+  }
+
   // command-palette/settings.js
-  var commandChainFunctions = {
+  var form = new ZenuxSettings(PREFS2), commandChainFunctions = {
     delay: {
       label: "Delay",
       params: [{ name: "time", type: "number", label: "Time (ms)", defaultValue: 500 }]
@@ -1975,34 +3219,21 @@ Only proceed if you trust the source of this command. You will not be asked agai
     _mainModule: null,
     _currentSettings: {},
     _initialSettingsState: null,
-    _currentShortcutTarget: null,
-    _boundHandleShortcutKeyDown: null,
-    _boundCloseOnEscape: null,
     _boundEditorClickHandler: null,
-    _showCommandIconsInSelect: !1,
     init(mainModule) {
-      this._mainModule = mainModule, this._boundHandleShortcutKeyDown = this._handleShortcutKeyDown.bind(this), this._boundCloseOnEscape = this._closeOnEscape.bind(this);
+      this._mainModule = mainModule;
     },
     async show(tabId = "commands") {
       if (this._modalElement)
         this.hide();
-      this._currentSettings = await Storage.loadSettings(), this._initialSettingsState = JSON.stringify(this._currentSettings), this._modalElement = this._generateHtml(), document.documentElement.appendChild(this._modalElement), this._populateCommandsTab(), this._populateSettingsTab(), this._populateCustomCommandsTab(), this._populateHelpTab(), this._attachEventListeners(), window.addEventListener("keydown", this._boundCloseOnEscape), this.switchTab(tabId);
+      this._currentSettings = await Storage.loadSettings(), this._initialSettingsState = JSON.stringify(this._currentSettings), this._modalElement = this._generateHtml(), document.documentElement.appendChild(this._modalElement), this._populateCommandsTab(), this._populateSettingsTab(), this._populateCustomCommandsTab(), await this._populateQuickSplitSection(), this._populateHelpTab(), this._attachEventListeners(), form.attachTabs(this._modalElement, tabId);
     },
     hide() {
-      if (this._modalElement)
+      if (form.close(), this._modalElement)
         this._modalElement.remove(), this._modalElement = null;
-      window.removeEventListener("keydown", this._boundHandleShortcutKeyDown, !0), window.removeEventListener("keydown", this._boundCloseOnEscape), this._currentShortcutTarget = null;
-    },
-    _closeOnEscape(event) {
-      if (event.key === "Escape")
-        this.hide();
-    },
-    _sanitizeForId(str) {
-      return str.replace(/[^a-zA-Z0-9-_]/g, "-");
     },
     switchTab(tabId) {
-      let modal = this._modalElement;
-      modal.querySelectorAll(".cmd-settings-tab-content").forEach((el) => el.hidden = !0), modal.querySelectorAll(".cmd-settings-tab").forEach((el) => el.classList.remove("active")), modal.querySelector(`#${tabId}-tab-content`).hidden = !1, modal.querySelector(`[data-tab="${tabId}"]`).classList.add("active");
+      form.switchTab(this._modalElement, tabId);
     },
     async saveSettings() {
       let defaultShortcuts = this._mainModule._getDefaultShortcuts(), filteredCustomShortcuts = {};
@@ -2014,7 +3245,8 @@ Only proceed if you trust the source of this command. You will not be asked agai
         customIcons: { ...this._currentSettings.customIcons },
         customShortcuts: filteredCustomShortcuts,
         toolbarButtons: [...this._currentSettings.toolbarButtons || []],
-        customCommands: [...this._currentSettings.customCommands || []]
+        customCommands: [...this._currentSettings.customCommands || []],
+        quickSplitKeywords: { ...this._currentSettings.quickSplitKeywords || {} }
       };
       this._modalElement.querySelectorAll(".command-item").forEach((item) => {
         let key = item.dataset.key, visibilityToggle = item.querySelector(".visibility-toggle");
@@ -2052,12 +3284,10 @@ Only proceed if you trust the source of this command. You will not be asked agai
     },
     _attachEventListeners() {
       let modal = this._modalElement;
-      modal.querySelector("#cmd-settings-close").addEventListener("click", () => this.hide()), modal.querySelector("#cmd-settings-save").addEventListener("click", () => this.saveSettings()), modal.addEventListener("click", (e) => {
-        if (e.target === modal)
-          this.hide();
-      }), modal.querySelectorAll(".cmd-settings-tab").forEach((tab) => {
-        tab.addEventListener("click", (e) => this.switchTab(e.target.dataset.tab));
-      }), modal.querySelector("#command-search-input").addEventListener("input", (e) => this._filterCommands(e.target.value)), modal.querySelectorAll(".help-button").forEach((button) => {
+      form.attachDismiss(modal, () => this.hide()), form.attachAccordion(modal), form.attachResetButtons(modal, (prefKey) => {
+        if (prefKey === PREFS2.DYNAMIC_QUICK_SPLIT)
+          this._updateQuickSplitSectionVisibility();
+      }), modal.querySelector("#cmd-settings-save").addEventListener("click", () => this.saveSettings()), modal.querySelector("#command-search-input").addEventListener("input", (e) => this._filterCommands(e.target.value)), modal.querySelector(`[data-pref="${PREFS2.DYNAMIC_QUICK_SPLIT}"]`)?.addEventListener("change", () => this._updateQuickSplitSectionVisibility()), modal.querySelectorAll(".help-button").forEach((button) => {
         button.addEventListener("click", (e) => {
           let url = e.currentTarget.dataset.url;
           if (url)
@@ -2066,16 +3296,21 @@ Only proceed if you trust the source of this command. You will not be asked agai
       });
     },
     _filterCommands(query) {
-      let lowerQuery = query.toLowerCase().trim(), commandList = this._modalElement.querySelector("#commands-list");
+      let cleanQuery = (query || "").trim(), commandList = this._modalElement.querySelector("#commands-list");
       commandList.querySelectorAll(".command-item").forEach((item) => {
-        let label = (item.querySelector(".command-label")?.textContent || "").toLowerCase(), key = (item.dataset.key || "").toLowerCase();
-        item.hidden = !(label.includes(lowerQuery) || key.includes(lowerQuery));
-      }), commandList.querySelectorAll(".commands-group").forEach((group) => {
-        let header = group.querySelector(".commands-group-header");
-        if (header) {
-          let hasVisibleItems = !!group.querySelector(".command-item:not([hidden])");
-          header.hidden = !hasVisibleItems;
+        if (!cleanQuery) {
+          item.hidden = !1, item.dataset.score = "0";
+          return;
         }
+        let label = item.querySelector(".command-label")?.textContent || "", key = item.dataset.key || "", score = bestFuzzyScore([label, key], cleanQuery);
+        item.hidden = score <= 0, item.dataset.score = String(score);
+      }), commandList.querySelectorAll(".commands-group").forEach((group) => {
+        let visibleItems = [...group.querySelectorAll(".command-item:not([hidden])")].sort((a, b) => Number(b.dataset.score || 0) - Number(a.dataset.score || 0));
+        for (let item of visibleItems)
+          group.appendChild(item);
+        let header = group.querySelector(".commands-group-header");
+        if (header)
+          header.hidden = visibleItems.length === 0;
       });
     },
     async _populateCommandsTab() {
@@ -2112,48 +3347,56 @@ Only proceed if you trust the source of this command. You will not be asked agai
     },
     _renderCommand(container, cmd) {
       let isHidden = this._currentSettings.hiddenCommands.includes(cmd.key), customIcon = this._currentSettings.customIcons[cmd.key], customShortcut = this._currentSettings.customShortcuts[cmd.key], nativeShortcut = this._mainModule.getShortcutForCommand(cmd.key), allowIconChange = cmd.allowIcons !== !1, allowShortcutChange = cmd.allowShortcuts !== !1, allowToolbarButton = cmd.allowShortcuts !== !1, shortcutValue = customShortcut || nativeShortcut || "", prettyShortcut = shortcutValue ? getPrettyShortcut(shortcutValue) : "", shortcutInputHtml = `<div class="shortcut-input-wrapper">
-      <input type="text" class="shortcut-input" placeholder="Set Shortcut" value="${escapeXmlAttribute(prettyShortcut)}" ${!allowShortcutChange ? "readonly" : ""} />
-      <span class="shortcut-conflict-warning" hidden title="Shortcut conflict"></span>
-    </div>`, visibilityToggleHtml = `<input type="checkbox" class="visibility-toggle" title="Show/Hide Command" ${!isHidden ? "checked" : ""} />`, isToolbarButton = this._currentSettings.toolbarButtons?.includes(cmd.key), toolbarButtonHtml = allowToolbarButton ? `<button class="toolbar-button-toggle ${isToolbarButton ? "active" : ""}" title="${isToolbarButton ? "Remove from Toolbar" : "Add to Toolbar"}">${icons.pin}</button>` : "", itemHtml = `
+      <input type="text" class="shortcut-input zenux-input zenux-shortcut-input" placeholder="Set Shortcut" value="${escapeXmlAttribute(prettyShortcut)}" ${!allowShortcutChange ? "readonly" : ""} />
+    </div>`, visibilityToggleHtml = `<input type="checkbox" class="visibility-toggle" title="Show/Hide Command" ${!isHidden ? "checked" : ""} />`, isToolbarButton = this._currentSettings.toolbarButtons?.includes(cmd.key), toolbarButtonHtml = allowToolbarButton ? `<button class="toolbar-button-toggle zenux-icon-btn zenux-icon-btn-accent ${isToolbarButton ? "is-active" : ""}" title="${isToolbarButton ? "Remove from Toolbar" : "Add to Toolbar"}">${icons.pin}</button>` : "", itemHtml = `
       <div class="command-item" data-key="${escapeXmlAttribute(cmd.key)}">
-        <img src="${escapeXmlAttribute(customIcon || cmd.icon || "chrome://browser/skin/trending.svg")}" class="command-icon ${allowIconChange ? "editable" : ""}" />
-        <span class="command-label">${escapeXmlAttribute(cmd.label)}</span>
+        <span class="command-label">${escapeXmlAttribute(cmd.label)}${cmd.prettyName ? ` <span class="zenux-count">${escapeXmlAttribute(cmd.prettyName)}</span>` : ""}</span>
         <div class="command-controls">
             ${shortcutInputHtml}
             ${toolbarButtonHtml}
             ${visibilityToggleHtml}
         </div>
+        <span class="shortcut-conflict-warning zenux-settings-conflict-note" hidden title="Shortcut conflict"></span>
       </div>
     `, item = parseElement(itemHtml);
-      if (container.appendChild(item), item.querySelector(".command-icon").onerror = function() {
-        this.src = "chrome://browser/skin/trending.svg", this.onerror = null;
-      }, allowIconChange)
-        item.querySelector(".command-icon").addEventListener("click", (e) => {
-          let newIconInput = prompt("Enter new icon URL or paste SVG code:", e.target.src);
+      container.appendChild(item);
+      let iconEl = xulImage(customIcon || cmd.icon || "chrome://browser/skin/zen-icons/bolt.svg", `command-icon${allowIconChange ? " editable" : ""}`);
+      if (item.insertBefore(iconEl, item.querySelector(".command-label")), iconEl.addEventListener("error", () => {
+        iconEl.setAttribute("src", "chrome://browser/skin/zen-icons/bolt.svg");
+      }, { once: !0 }), allowIconChange)
+        iconEl.addEventListener("click", (e) => {
+          let newIconInput = prompt("Enter new icon URL or paste SVG code:", e.target.getAttribute("src"));
           if (newIconInput !== null) {
             let finalIconSrc = newIconInput.trim();
             if (finalIconSrc.startsWith("<svg") && finalIconSrc.endsWith("</svg>"))
               finalIconSrc = svgToUrl(finalIconSrc);
-            e.target.src = finalIconSrc, this._currentSettings.customIcons[cmd.key] = finalIconSrc;
+            e.target.setAttribute("src", finalIconSrc), this._currentSettings.customIcons[cmd.key] = finalIconSrc;
           }
         });
       if (allowShortcutChange) {
-        let shortcutInput = item.querySelector(".shortcut-input"), conflictWarning = item.querySelector(".shortcut-conflict-warning");
-        shortcutInput.addEventListener("focus", (e) => {
-          if (this._currentShortcutTarget = e.target, e.target.placeholder = "Press keys...", conflictWarning)
-            conflictWarning.hidden = !0;
-          window.addEventListener("keydown", this._boundHandleShortcutKeyDown, !0);
-        }), shortcutInput.addEventListener("blur", () => {
-          if (this._currentShortcutTarget) {
-            if (this._currentShortcutTarget.classList.contains("conflict"))
-              this._currentShortcutTarget.value = this._currentSettings.customShortcuts[cmd.key] || nativeShortcut || "";
-            if (this._currentShortcutTarget.classList.remove("conflict"), conflictWarning)
-              conflictWarning.hidden = !0;
-            this._currentShortcutTarget = null;
+        let shortcutInput = item.querySelector(".shortcut-input"), conflictWarning = item.querySelector(".shortcut-conflict-warning"), showConflict = (conflicts) => {
+          if (shortcutInput.classList.add("is-conflict"), conflictWarning) {
+            let conflictDetails = conflicts.map((c) => c.source === "zen" ? `Zen: ${c.id}` : `Custom: ${c.id}`).join(", ");
+            conflictWarning.textContent = `Conflict: ${conflictDetails}`, conflictWarning.title = `Conflicts with: ${conflictDetails}`, conflictWarning.setAttribute("aria-label", `Conflicts with: ${conflictDetails}`), conflictWarning.hidden = !1, shortcutInput.title = `Shortcut conflicts with: ${conflictDetails}`;
           }
-          window.removeEventListener("keydown", this._boundHandleShortcutKeyDown, !0);
-        }), shortcutInput.addEventListener("keydown", (e) => {
-          e.preventDefault(), e.stopPropagation();
+        }, clearConflict = () => {
+          if (shortcutInput.classList.remove("is-conflict"), conflictWarning)
+            conflictWarning.hidden = !0;
+          shortcutInput.title = "";
+        };
+        shortcutInput.addEventListener("focus", clearConflict), attachStandaloneShortcutRecorder(shortcutInput, {
+          initialValue: customShortcut || nativeShortcut || "",
+          onCommit: (shortcutString) => {
+            if (this._currentSettings.customShortcuts[cmd.key] = shortcutString, !shortcutString) {
+              clearConflict();
+              return;
+            }
+            let conflictCheck = checkShortcutConflicts(shortcutString, cmd.key);
+            if (conflictCheck.hasConflict)
+              showConflict(conflictCheck.conflicts), PREFS2.debugLog(`Shortcut conflict detected for "${cmd.key}" with shortcut "${shortcutString}":`, conflictCheck.conflicts);
+            else
+              clearConflict();
+          }
         });
       }
       if (allowToolbarButton)
@@ -2163,44 +3406,10 @@ Only proceed if you trust the source of this command. You will not be asked agai
             this._currentSettings.toolbarButtons = [];
           let index = this._currentSettings.toolbarButtons.indexOf(commandKey);
           if (index > -1)
-            this._currentSettings.toolbarButtons.splice(index, 1), button.classList.remove("active"), button.title = "Add to Toolbar";
+            this._currentSettings.toolbarButtons.splice(index, 1), button.classList.remove("is-active"), button.title = "Add to Toolbar";
           else
-            this._currentSettings.toolbarButtons.push(commandKey), button.classList.add("active"), button.title = "Remove from Toolbar";
+            this._currentSettings.toolbarButtons.push(commandKey), button.classList.add("is-active"), button.title = "Remove from Toolbar";
         });
-    },
-    _handleShortcutKeyDown(event) {
-      if (!this._currentShortcutTarget)
-        return;
-      event.preventDefault(), event.stopPropagation();
-      let key = event.key, targetInput = this._currentShortcutTarget, commandItem = targetInput.closest(".command-item"), commandKey = commandItem?.dataset.key, conflictWarning = commandItem?.querySelector(".shortcut-conflict-warning"), clearConflict = () => {
-        if (targetInput.classList.remove("conflict"), conflictWarning)
-          conflictWarning.hidden = !0;
-      };
-      if (key === "Escape") {
-        clearConflict(), targetInput.blur();
-        return;
-      }
-      if (key === "Backspace" || key === "Delete") {
-        if (targetInput.value = "", commandKey)
-          this._currentSettings.customShortcuts[commandKey] = "";
-        clearConflict(), window.removeEventListener("keydown", this._boundHandleShortcutKeyDown, !0), this._currentShortcutTarget = null, targetInput.blur();
-        return;
-      }
-      if (!commandKey) {
-        targetInput.blur();
-        return;
-      }
-      if (["Control", "Alt", "Shift", "Meta"].includes(key))
-        return;
-      let shortcutString = eventToShortcutSignature(event), conflictCheck = checkShortcutConflicts(shortcutString, commandKey);
-      if (targetInput.value = getPrettyShortcut(shortcutString), conflictCheck.hasConflict) {
-        if (targetInput.classList.add("conflict"), conflictWarning) {
-          let conflictDetails = conflictCheck.conflicts.map((c) => c.source === "zen" ? `Zen: ${c.id}` : `Custom: ${c.id}`).join(", ");
-          conflictWarning.textContent = `Conflict: ${conflictDetails}`, conflictWarning.title = `Conflicts with: ${conflictDetails}`, conflictWarning.setAttribute("aria-label", `Conflicts with: ${conflictDetails}`), conflictWarning.hidden = !1, targetInput.title = `Shortcut conflicts with: ${conflictDetails}`;
-        }
-        PREFS2.debugLog(`Shortcut conflict detected for "${commandKey}" with shortcut "${shortcutString}":`, conflictCheck.conflicts), this._currentSettings.customShortcuts[commandKey] = shortcutString;
-      } else
-        clearConflict(), this._currentSettings.customShortcuts[commandKey] = shortcutString, targetInput.title = "";
     },
     _populateCustomCommandsTab() {
       let container = this._modalElement.querySelector("#custom-commands-tab-content"), content = parseElement(`
@@ -2209,8 +3418,8 @@ Only proceed if you trust the source of this command. You will not be asked agai
           <div class="custom-commands-toolbar">
             <p>Define your own commands. They will be available in the command palette immediately after saving.</p>
             <div class="custom-commands-actions">
-              <button id="add-js-command">Add JS Command</button>
-              <button id="add-chain-command">Add Command Chain</button>
+              <button id="add-js-command" class="zenux-btn-primary">Add JS Command</button>
+              <button id="add-chain-command" class="zenux-btn-ghost">Add Command Chain</button>
             </div>
           </div>
           <div id="custom-commands-list"></div>
@@ -2239,22 +3448,21 @@ Only proceed if you trust the source of this command. You will not be asked agai
       listContainer.innerHTML = "";
       let customCommands = this._currentSettings.customCommands || [];
       if (customCommands.length === 0) {
-        listContainer.innerHTML = '<p class="no-custom-commands">No custom commands yet. Add one to get started!</p>';
+        listContainer.innerHTML = '<p class="no-custom-commands zenux-empty">No custom commands yet. Add one to get started!</p>';
         return;
       }
       customCommands.forEach((cmd) => {
-        let icon = cmd.icon || "chrome://browser/skin/trending.svg", item = parseElement(`
+        let icon = cmd.icon || "chrome://browser/skin/zen-icons/bolt.svg", item = parseElement(`
         <div class="custom-command-item" data-id="${cmd.id}">
-          <img src="${escapeXmlAttribute(icon)}" class="custom-command-icon" />
           <span class="custom-command-name">${escapeXmlAttribute(cmd.name)}</span>
-          <span class="custom-command-type">${cmd.type === "js" ? "JS" : "Chain"}</span>
+          <span class="custom-command-type zenux-count">${cmd.type === "js" ? "JS" : "Chain"}</span>
           <div class="custom-command-controls">
-            <button class="edit-custom-cmd icon-button" title="Edit Command"><img src="chrome://global/skin/icons/edit.svg" /></button>
-            <button class="delete-custom-cmd delete-button icon-button" title="Delete Command"><img src="chrome://browser/skin/zen-icons/edit-delete.svg" /></button>
+            <button class="edit-custom-cmd zenux-icon-btn" title="Edit Command"><img src="chrome://global/skin/icons/edit.svg" /></button>
+            <button class="delete-custom-cmd zenux-icon-btn zenux-icon-btn-danger" title="Delete Command"><img src="chrome://browser/skin/zen-icons/edit-delete.svg" /></button>
           </div>
         </div>
       `);
-        item.querySelector(".edit-custom-cmd").addEventListener("click", () => {
+        item.insertBefore(xulImage(icon, "custom-command-icon"), item.querySelector(".custom-command-name")), item.querySelector(".edit-custom-cmd").addEventListener("click", () => {
           let commandData = (this._currentSettings.customCommands || []).find((c) => c.id === cmd.id);
           this._showCustomCommandEditor(commandData);
         }), item.querySelector(".delete-custom-cmd").addEventListener("click", () => this._deleteCustomCommand(cmd.id)), listContainer.appendChild(item);
@@ -2265,20 +3473,135 @@ Only proceed if you trust the source of this command. You will not be asked agai
         return;
       this._currentSettings.customCommands = (this._currentSettings.customCommands || []).filter((c) => c.id !== id), this._renderCustomCommands();
     },
-    _createCommandMenuItems(allCommands) {
-      return allCommands.sort((a, b) => a.label.localeCompare(b.label)).map((c) => {
-        let iconAttr = this._showCommandIconsInSelect ? `image="${escapeXmlAttribute(c.icon || "chrome://browser/skin/trending.svg")}"` : "";
-        return `<menuitem value="${escapeXmlAttribute(c.key)}"
-                         label="${escapeXmlAttribute(c.label)}"
-                         ${iconAttr}
-                         />`;
-      }).join("");
+    async _populateQuickSplitSection() {
+      let container = this._modalElement.querySelector("#settings-tab-content");
+      if (container.querySelector("#quick-split-section")?.remove(), !this._currentSettings.quickSplitKeywords || typeof this._currentSettings.quickSplitKeywords !== "object")
+        this._currentSettings.quickSplitKeywords = {};
+      let section = parseElement(ZenuxSettings.accordionSection({
+        title: "Quick Split",
+        icon: "chrome://browser/skin/zen-icons/split.svg",
+        expanded: !1,
+        id: "quick-split-section",
+        body: `
+        <div class="zenux-setting-item">
+          <label for="quick-split-search-engine">Search Engine</label>
+          <div id="quick-split-engine-picker"><span class="engine-picker-loading">Loading…</span></div>
+        </div>
+        <div class="quick-split-list-header">
+          <span>Keywords</span>
+          <button id="add-quick-split-keyword" class="zenux-btn-ghost" type="button"><img src="chrome://browser/skin/zen-icons/plus.svg" />Add Keyword</button>
+        </div>
+        <div id="quick-split-keywords-list"></div>
+      `
+      }));
+      container.appendChild(section), this._renderQuickSplitKeywords(), section.querySelector("#add-quick-split-keyword").addEventListener("click", () => {
+        let list = section.querySelector("#quick-split-keywords-list");
+        list.querySelector(".no-quick-split-keywords")?.remove();
+        let row = this._renderQuickSplitKeywordRow("", "");
+        list.appendChild(row), list.scrollTop = list.scrollHeight, row.querySelector(".keyword-key").focus();
+      }), await this._populateQuickSplitEnginePicker(section), this._updateQuickSplitSectionVisibility();
+    },
+    async _populateQuickSplitEnginePicker(section) {
+      let picker = section.querySelector("#quick-split-engine-picker");
+      try {
+        let engines = await getVisibleEngines(), defaultEngineName = null;
+        try {
+          defaultEngineName = (await getDefaultEngine())?.name ?? null;
+        } catch (e) {
+          PREFS2.debugError("Failed to get default search engine for Quick Split picker.", e);
+        }
+        let saved = PREFS2.getPref(PREFS2.QUICK_SPLIT_SEARCH_ENGINE) || "", current = "";
+        if (/^google lucky$/i.test(saved))
+          current = "Google Lucky";
+        else if (!saved || /^duckduckgo lucky$/i.test(saved))
+          current = "";
+        else if (engines.some((engine) => engine.name === saved))
+          current = saved;
+        let combo = createCombobox({
+          id: "quick-split-search-engine",
+          attrs: { "data-pref": PREFS2.QUICK_SPLIT_SEARCH_ENGINE },
+          value: current,
+          items: [
+            {
+              value: "",
+              label: "DuckDuckGo Lucky (Default)",
+              image: googleFaviconAPI("duckduckgo.com")
+            },
+            {
+              value: "Google Lucky",
+              label: "Google Lucky",
+              image: googleFaviconAPI("google.com")
+            },
+            ...engines.map((engine) => ({
+              value: engine.name,
+              label: engine.name === defaultEngineName ? `${engine.name} (Browser Default)` : engine.name,
+              image: getSearchEngineFavicon(engine)
+            }))
+          ]
+        });
+        picker.replaceChildren(combo);
+      } catch (e) {
+        PREFS2.debugError("Failed to load search engines for Quick Split picker.", e), picker.textContent = "Could not load search engines.";
+      }
+    },
+    _renderQuickSplitKeywords() {
+      let list = this._modalElement.querySelector("#quick-split-keywords-list");
+      list.innerHTML = "";
+      let keywords = this._currentSettings.quickSplitKeywords || {}, entries = Object.entries(keywords).sort(([a], [b]) => a.localeCompare(b));
+      if (entries.length === 0) {
+        list.innerHTML = '<p class="no-quick-split-keywords zenux-empty">No keywords yet. Add one to get started!</p>';
+        return;
+      }
+      for (let [keyword, url] of entries)
+        list.appendChild(this._renderQuickSplitKeywordRow(keyword, url));
+    },
+    _renderQuickSplitKeywordRow(keyword, url) {
+      let row = parseElement(`
+      <div class="keyword-row" data-key="${escapeXmlAttribute(keyword)}">
+        <input type="text" class="keyword-key zenux-input" value="${escapeXmlAttribute(keyword)}" placeholder="keyword" />
+        <input type="text" class="keyword-url zenux-input" value="${escapeXmlAttribute(url)}" placeholder="https://…" />
+        <button class="keyword-remove zenux-icon-btn zenux-icon-btn-danger" type="button" title="Remove Keyword"><img src="chrome://browser/skin/zen-icons/edit-delete.svg" /></button>
+      </div>
+    `);
+      return row.querySelector(".keyword-key").addEventListener("change", (e) => {
+        let keywords = this._currentSettings.quickSplitKeywords || {}, oldKey = row.dataset.key, newKey = e.target.value.trim().toLowerCase();
+        if (e.target.value = newKey, newKey === oldKey)
+          return;
+        let value = oldKey ? keywords[oldKey] : row.querySelector(".keyword-url").value.trim();
+        if (oldKey)
+          delete keywords[oldKey];
+        if (newKey && value)
+          keywords[newKey] = value;
+        row.dataset.key = newKey, this._currentSettings.quickSplitKeywords = keywords;
+      }), row.querySelector(".keyword-url").addEventListener("change", (e) => {
+        let keywords = this._currentSettings.quickSplitKeywords || {}, key = row.dataset.key;
+        if (!key)
+          return;
+        keywords[key] = e.target.value.trim(), this._currentSettings.quickSplitKeywords = keywords;
+      }), row.querySelector(".keyword-remove").addEventListener("click", () => {
+        let keywords = this._currentSettings.quickSplitKeywords || {};
+        if (row.dataset.key)
+          delete keywords[row.dataset.key];
+        this._currentSettings.quickSplitKeywords = keywords, this._renderQuickSplitKeywords();
+      }), row;
+    },
+    _updateQuickSplitSectionVisibility() {
+      let section = this._modalElement?.querySelector("#quick-split-section");
+      if (section)
+        section.hidden = !PREFS2.loadQuickSplit;
+    },
+    _getCommandComboItems(allCommands) {
+      return allCommands.sort((a, b) => a.label.localeCompare(b.label)).map((c) => ({
+        value: c.key,
+        label: c.label,
+        image: c.icon || "chrome://browser/skin/zen-icons/bolt.svg"
+      }));
     },
     _renderFunctionStep(step, index, chain) {
       let functionSchema = commandChainFunctions[step.action];
       if (!functionSchema)
         return parseElement(`<div>Unknown function: ${step.action}</div>`);
-      let wrapper = parseElement(`<div class="function-step" data-index="${index}"></div>`), label = parseElement(`<label>${escapeXmlAttribute(functionSchema.label)}</label>`);
+      let wrapper = parseElement(`<div class="function-step" data-index="${index}"></div>`), label = parseElement(`<label class="zenux-count">${escapeXmlAttribute(functionSchema.label)}</label>`);
       wrapper.appendChild(label);
       for (let param of functionSchema.params) {
         let paramWrapper = parseElement('<div class="param-item"></div>'), currentValue = step.params[param.name], inputHtml = "";
@@ -2287,7 +3610,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
           case "text":
             inputHtml = `<input
             type="${param.type}"
-            class="param-input"
+            class="param-input zenux-input"
             data-param="${param.name}"
             placeholder="${param.label || ""}"
             value="${escapeXmlAttribute(currentValue)}"
@@ -2317,13 +3640,13 @@ Only proceed if you trust the source of this command. You will not be asked agai
         editorContainer.removeEventListener("click", this._boundEditorClickHandler);
       let isEditing = !!cmd.name, currentChain = [...cmd.commands || []], baseEditorHtml = `
       <h3>${isEditing ? "Edit" : "Add"} ${cmd.type === "js" ? "JS Command" : "Command Chain"}</h3>
-      <div class="setting-item">
+      <div class="zenux-setting-item">
         <label for="custom-cmd-name">Name</label>
-        <input type="text" id="custom-cmd-name" value="${escapeXmlAttribute(cmd.name)}"/>
+        <input type="text" id="custom-cmd-name" class="zenux-input" value="${escapeXmlAttribute(cmd.name)}"/>
       </div>
-      <div class="setting-item">
+      <div class="zenux-setting-item">
         <label for="custom-cmd-icon">Icon URL</label>
-        <input type="text" id="custom-cmd-icon" placeholder="Leave empty for default" value="${escapeXmlAttribute(cmd.icon || "")}"/>
+        <input type="text" id="custom-cmd-icon" class="zenux-input" placeholder="Leave empty for default" value="${escapeXmlAttribute(cmd.icon || "")}"/>
       </div>
     `, typeSpecificHtml;
       if (cmd.type === "js")
@@ -2334,7 +3657,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
             ${icons.warning}
             Only run code from sources you trust. Malicious code can compromise your browser.
           </div>
-          <textarea id="custom-cmd-code">${escapeXmlAttribute(cmd.code)}</textarea>
+          <textarea id="custom-cmd-code" class="zenux-input">${escapeXmlAttribute(cmd.code)}</textarea>
         </div>
       `;
       else
@@ -2344,11 +3667,11 @@ Only proceed if you trust the source of this command. You will not be asked agai
           <div id="chain-builder">
             <div id="chain-command-selector-container">
               <div id="chain-command-selector-placeholder">Loading...</div>
-              <button id="add-command-to-chain">Add Command</button>
+              <button id="add-command-to-chain" class="zenux-btn-primary">Add Command</button>
             </div>
             <div class="function-actions">
                 <label>Add Function:</label>
-                ${Object.entries(commandChainFunctions).map(([action, schema]) => `<button data-action="${action}">${schema.label}</button>`).join("")}
+                ${Object.entries(commandChainFunctions).map(([action, schema]) => `<button class="zenux-btn-ghost" data-action="${action}">${schema.label}</button>`).join("")}
             </div>
             <div id="current-chain-list"></div>
           </div>
@@ -2356,11 +3679,15 @@ Only proceed if you trust the source of this command. You will not be asked agai
       `;
       let fullEditorHtml = `<div>${baseEditorHtml}${typeSpecificHtml}${`
       <div class="custom-command-editor-actions">
-        <button id="cancel-custom-cmd">Cancel</button>
-        <button id="save-custom-cmd">Save Command</button>
+        <button id="cancel-custom-cmd" class="zenux-btn-ghost">Cancel</button>
+        <button id="save-custom-cmd" class="zenux-btn-primary">Save Command</button>
       </div>
     `}</div>`;
-      editorContainer.replaceChildren(parseElement(fullEditorHtml));
+      if (editorContainer.replaceChildren(parseElement(fullEditorHtml)), cmd.type === "js") {
+        let codeInput = editorContainer.querySelector("#custom-cmd-code");
+        if (codeInput)
+          attachCodeEditor(codeInput);
+      }
       let renderChainList = async () => {
         PREFS2.debugLog("renderChainList called");
         let listContainer = editorContainer.querySelector("#current-chain-list");
@@ -2369,22 +3696,24 @@ Only proceed if you trust the source of this command. You will not be asked agai
           return;
         }
         if (listContainer.innerHTML = "", currentChain.length === 0) {
-          listContainer.innerHTML = '<p class="no-custom-commands">No commands in chain. Use the dropdown above to add one.</p>';
+          listContainer.innerHTML = '<p class="no-custom-commands zenux-empty">No commands in chain. Use the dropdown above to add one.</p>';
           return;
         }
         let allCommands = await this._mainModule.getAllCommandsForConfig();
         PREFS2.debugLog(`renderChainList: building list with ${currentChain.length} items`);
-        let menuitemsXUL = this._createCommandMenuItems(allCommands);
+        let comboItems = this._getCommandComboItems(allCommands);
         currentChain.forEach((step, index) => {
           let itemContainer = parseElement('<div class="chain-item-container"></div>');
           if (typeof step === "string") {
-            let menulistXUL = `
-              <menulist class="chain-item-selector" value="${escapeXmlAttribute(step)}">
-                <menupopup>${menuitemsXUL}</menupopup>
-              </menulist>`, menulistElement = parseElement(menulistXUL, "xul");
-            menulistElement.addEventListener("command", (e) => {
+            let combo = createCombobox({
+              extraClass: "chain-item-selector",
+              value: step,
+              items: comboItems,
+              placeholder: "Select a command…"
+            });
+            combo.addEventListener("command", (e) => {
               currentChain[index] = e.target.value;
-            }), itemContainer.appendChild(menulistElement);
+            }), itemContainer.appendChild(combo);
           } else if (typeof step === "object" && step.action) {
             PREFS2.debugLog(`Rendering function step: ${step.action}`);
             let functionStepEl = self._renderFunctionStep(step, index, currentChain);
@@ -2392,7 +3721,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
           }
           let arrowControls = parseElement('<div class="chain-item-arrow-controls"></div>');
           if (index > 0) {
-            let upButton = parseElement(`<button class="move-up-button icon-button" title="Move Up">
+            let upButton = parseElement(`<button class="move-up-button zenux-icon-btn" title="Move Up">
                <img src="chrome://global/skin/icons/arrow-up.svg" />
              </button>`);
             upButton.addEventListener("click", () => {
@@ -2403,7 +3732,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
             }), arrowControls.appendChild(upButton);
           }
           if (index < currentChain.length - 1) {
-            let downButton = parseElement(`<button class="move-down-button icon-button" title="Move Down">
+            let downButton = parseElement(`<button class="move-down-button zenux-icon-btn" title="Move Down">
                <img src="chrome://global/skin/icons/arrow-down.svg" />
              </button>`);
             downButton.addEventListener("click", () => {
@@ -2414,7 +3743,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
             }), arrowControls.appendChild(downButton);
           }
           itemContainer.appendChild(arrowControls);
-          let deleteButton = parseElement(`<button class="delete-button icon-button" title="Remove Command">
+          let deleteButton = parseElement(`<button class="zenux-icon-btn zenux-icon-btn-danger" title="Remove Command">
              <img src="chrome://browser/skin/zen-icons/edit-delete.svg" />
            </button>`);
           deleteButton.addEventListener("click", () => {
@@ -2457,16 +3786,13 @@ Only proceed if you trust the source of this command. You will not be asked agai
             PREFS2.debugLog("Chain editor: placeholder DIV not found!");
             return;
           }
-          let menulistXUL = `
-            <menulist id="chain-command-selector">
-              <menupopup>${this._createCommandMenuItems(allCommands)}</menupopup>
-            </menulist>`;
-          try {
-            let menulistElement = parseElement(menulistXUL, "xul");
-            placeholder.replaceWith(menulistElement), PREFS2.debugLog("Chain editor: XUL menulist successfully created and inserted.");
-          } catch (e) {
-            PREFS2.debugLog("Chain editor: Failed to parse or insert XUL menulist.", e), placeholder.textContent = "Error creating command list.";
-          }
+          let menuitems = this._getCommandComboItems(allCommands), combo = createCombobox({
+            id: "chain-command-selector",
+            value: "",
+            items: menuitems,
+            placeholder: "Select a command…"
+          });
+          placeholder.replaceWith(combo);
         }).catch((err) => {
           PREFS2.debugLog("Chain editor: getAllCommandsForConfig promise rejected.", err);
           let placeholder = editorContainer.querySelector("#chain-command-selector-placeholder");
@@ -2508,10 +3834,16 @@ Only proceed if you trust the source of this command. You will not be asked agai
       container.innerHTML = "";
       let helpItems = [
         {
-          url: "https://github.com/Vertex-Mods/Zen-Command-Palette/tree/main/command-palette",
+          url: "https://github.com/Vertex-Mods/Zen-Command-Palette",
           icon: svgToUrl(icons.book),
           title: "View Documentation",
           description: "Read the full guide on GitHub."
+        },
+        {
+          url: "https://github.com/Vertex-Mods/Zen-Command-Palette/blob/main/README.md#quick-split",
+          icon: "chrome://browser/skin/zen-icons/split.svg",
+          title: "Quick Split Guide",
+          description: "Split views and glance from the palette."
         },
         {
           url: "https://github.com/Vertex-Mods/Zen-Command-Palette",
@@ -2520,14 +3852,14 @@ Only proceed if you trust the source of this command. You will not be asked agai
           description: "Enjoying the mod? Leave a star!"
         },
         {
-          url: "https://github.com/BibekBhusal0/zen-custom-js/issues/new",
+          url: "https://github.com/BibekBhusal0/zen-custom-js/issues/new?template=bug_report.yml&mod=Command+Palette",
           icon: svgToUrl(icons.bug),
           title: "Report a Bug",
           description: "Found an issue? Let us know."
         },
         {
           url: "https://github.com/BibekBhusal0/zen-custom-js/issues/22",
-          icon: "chrome://browser/skin/trending.svg",
+          icon: "chrome://browser/skin/zen-icons/bolt.svg",
           title: "More Commands",
           description: "Want more commands? Share your ideas here."
         }
@@ -2551,109 +3883,68 @@ Only proceed if you trust the source of this command. You will not be asked agai
         key: provider.pref,
         label: this._mainModule._getProviderLabel(provider.func.name),
         type: "bool"
-      })), prefs = [
-        {
-          section: "General",
-          items: [
-            {
-              key: PREFS2.PREFIX,
-              label: "Command Prefix",
-              type: "char"
-            },
-            {
-              key: PREFS2.PREFIX_REQUIRED,
-              label: "Require prefix to activate",
-              type: "bool"
-            },
-            {
-              key: PREFS2.MIN_QUERY_LENGTH,
-              label: "Min query length (no prefix)",
-              type: "number"
-            },
-            { key: PREFS2.MAX_COMMANDS, label: "Max results (no prefix)", type: "number" },
-            {
-              key: PREFS2.MAX_COMMANDS_PREFIX,
-              label: "Max results (with prefix)",
-              type: "number"
-            },
-            { key: PREFS2.MIN_SCORE_THRESHOLD, label: "Min relevance score", type: "number" },
-            { key: PREFS2.DEBUG_MODE, label: "Enable debug logging", type: "bool" }
-          ]
-        },
-        {
-          section: "Dynamic Commands",
+      }));
+      if (container.appendChild(parseElement(form.prefAccordion({
+        title: "General",
+        icon: "chrome://browser/skin/zen-icons/settings.svg",
+        expanded: !0,
+        items: [
+          { key: PREFS2.PREFIX, label: "Command Prefix", type: "char", maxlength: 1 },
+          { key: PREFS2.PREFIX_REQUIRED, label: "Require prefix to activate", type: "bool" },
+          { key: PREFS2.MIN_QUERY_LENGTH, label: "Min query length (no prefix)", type: "number" },
+          { key: PREFS2.MAX_COMMANDS, label: "Max results (no prefix)", type: "number" },
+          { key: PREFS2.MAX_COMMANDS_PREFIX, label: "Max results (with prefix)", type: "number" },
+          { key: PREFS2.MIN_SCORE_THRESHOLD, label: "Min relevance score", type: "number" },
+          { key: PREFS2.DEBUG_MODE, label: "Enable debug logging", type: "bool" }
+        ]
+      }))), dynamicCommandItems.length)
+        container.appendChild(parseElement(form.prefAccordion({
+          title: "Dynamic Commands",
+          icon: "chrome://browser/skin/zen-icons/bolt.svg",
+          expanded: !0,
           items: dynamicCommandItems
-        }
-      ];
-      for (let prefSection of prefs) {
-        let sectionEl = document.createElement("section");
-        sectionEl.className = "settings-section", sectionEl.innerHTML = `<h4>${escapeXmlAttribute(prefSection.section)}</h4>`;
-        for (let item of prefSection.items) {
-          let currentValue = PREFS2.getPref(item.key), safeId = this._sanitizeForId(`pref-${item.key}`), itemHtml;
-          if (item.type === "bool")
-            itemHtml = `
-            <div class="setting-item">
-              <label for="${safeId}">${escapeXmlAttribute(item.label)}</label>
-              <input type="checkbox" id="${safeId}" data-pref="${item.key}" ${currentValue ? "checked" : ""} />
-            </div>
-          `;
-          else if (item.type === "number")
-            itemHtml = `
-            <div class="setting-item">
-              <label for="${safeId}">${escapeXmlAttribute(item.label)}</label>
-              <input type="number" id="${safeId}" data-pref="${item.key}" value="${escapeXmlAttribute(currentValue)}" />
-            </div>
-          `;
-          else if (item.type === "char")
-            itemHtml = `
-            <div class="setting-item">
-              <label for="${safeId}">${escapeXmlAttribute(item.label)}</label>
-              <input type="text" id="${safeId}" data-pref="${item.key}" value="${escapeXmlAttribute(currentValue)}" maxlength="1" />
-            </div>
-          `;
-          if (itemHtml)
-            sectionEl.appendChild(parseElement(itemHtml));
-        }
-        container.appendChild(sectionEl);
-      }
+        })));
     },
     _generateHtml() {
-      return parseElement(`
-      <div id="zen-cmd-settings-modal-overlay">
-        <div class="command-palette-settings-modal">
-          <div class="cmd-settings-header">
-            <h3>Command Palette Settings</h3>
-            <div>
-              <button id="cmd-settings-close" class="settings-close-btn">Close</button>
-              <button id="cmd-settings-save" class="settings-save-btn">Save Settings</button>
-            </div>
-          </div>
-          <div class="cmd-settings-tabs">
-            <button class="cmd-settings-tab" data-tab="commands">Commands</button>
-            <button class="cmd-settings-tab" data-tab="settings">Settings</button>
-            <button class="cmd-settings-tab" data-tab="custom-commands">Custom Commands</button>
-            <button class="cmd-settings-tab" data-tab="help">Help</button>
-          </div>
-          <div class="cmd-settings-content">
-            <div id="commands-tab-content" class="cmd-settings-tab-content" hidden>
-              <div class="search-bar-wrapper">
-                <input type="text" id="command-search-input" placeholder="Search commands..." />
-              </div>
-              <div id="commands-list"></div>
-            </div>
-            <div id="settings-tab-content" class="cmd-settings-tab-content" hidden>
-              <!-- Content will be populated by _populateSettingsTab -->
-              </div>
-            <div id="custom-commands-tab-content" class="cmd-settings-tab-content" hidden>
-              <!-- Content will be populated by _populateCustomCommandsTab -->
-              </div>
-            <div id="help-tab-content" class="cmd-settings-tab-content" hidden>
-              <!-- Content will be populated by _populateHelpTab -->
-              </div>
-          </div>
+      let html = ZenuxSettings.shell({
+        title: "Command Palette Settings",
+        bodyHTML: `
+      <div id="commands-tab-content" data-tab-content="commands" hidden>
+        <div class="search-bar-wrapper">
+          <input type="text" id="command-search-input" class="zenux-input" placeholder="Search commands..." />
         </div>
+        <div id="commands-list"></div>
       </div>
-    `);
+      <div id="settings-tab-content" data-tab-content="settings" hidden>
+        <!-- Content will be populated by _populateSettingsTab -->
+      </div>
+      <div id="custom-commands-tab-content" data-tab-content="custom-commands" hidden>
+        <!-- Content will be populated by _populateCustomCommandsTab -->
+      </div>
+      <div id="help-tab-content" data-tab-content="help" hidden>
+        <!-- Content will be populated by _populateHelpTab -->
+      </div>
+    `,
+        tabs: [
+          {
+            id: "commands",
+            label: "Commands",
+            icon: "chrome://browser/skin/zen-icons/selectable/terminal.svg"
+          },
+          { id: "settings", label: "Settings", icon: "chrome://browser/skin/zen-icons/settings.svg" },
+          {
+            id: "custom-commands",
+            label: "Custom Commands",
+            icon: "chrome://browser/skin/zen-icons/selectable/code.svg"
+          },
+          { id: "help", label: "Help", icon: "chrome://browser/skin/zen-icons/help.svg" }
+        ],
+        closeId: "cmd-settings-close",
+        saveId: "cmd-settings-save",
+        overlayId: "zen-cmd-settings-modal-overlay",
+        modalClass: "command-palette-settings-modal"
+      });
+      return parseElement(html);
     }
   };
 
@@ -2748,6 +4039,12 @@ Only proceed if you trust the source of this command. You will not be asked agai
         allowShortcuts: !1
       },
       {
+        func: generateWorkspaceCommands,
+        pref: PREFS2.DYNAMIC_WORKSPACES,
+        allowIcons: !0,
+        allowShortcuts: !0
+      },
+      {
         func: generateWorkspaceMoveCommands,
         pref: PREFS2.DYNAMIC_WORKSPACES,
         allowIcons: !0,
@@ -2800,6 +4097,12 @@ Only proceed if you trust the source of this command. You will not be asked agai
         pref: PREFS2.DYNAMIC_EXTENSION_UNINSTALL,
         allowIcons: !1,
         allowShortcuts: !1
+      },
+      {
+        func: generateProfileCommands,
+        pref: PREFS2.DYNAMIC_PROFILES,
+        allowIcons: !1,
+        allowShortcuts: !0
       }
     ],
     staticCommands: commands,
@@ -2861,36 +4164,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
       }
     },
     calculateFuzzyScore(target, query) {
-      if (!target || !query)
-        return 0;
-      let targetLower = target.toLowerCase(), queryLower = query.toLowerCase(), targetLen = target.length, queryLen = query.length;
-      if (queryLen > targetLen)
-        return 0;
-      if (queryLen === 0)
-        return 0;
-      if (targetLower === queryLower)
-        return 200;
-      if (targetLower.startsWith(queryLower))
-        return 100 + queryLen;
-      if (targetLower.split(/[\s-_]+/).map((word) => word[0]).join("") === queryLower)
-        return 90 + queryLen;
-      let score = 0, queryIndex = 0, lastMatchIndex = -1, consecutiveMatches = 0;
-      for (let targetIndex = 0;targetIndex < targetLen; targetIndex++)
-        if (queryIndex < queryLen && targetLower[targetIndex] === queryLower[queryIndex]) {
-          let bonus = 10;
-          if (targetIndex === 0 || [" ", "-", "_"].includes(targetLower[targetIndex - 1]))
-            bonus += 15;
-          if (lastMatchIndex === targetIndex - 1)
-            consecutiveMatches++, bonus += 20 * consecutiveMatches;
-          else
-            consecutiveMatches = 0;
-          if (lastMatchIndex !== -1) {
-            let distance = targetIndex - lastMatchIndex;
-            bonus -= Math.min(distance - 1, 10);
-          }
-          score += bonus, lastMatchIndex = targetIndex, queryIndex++;
-        }
-      return queryIndex === queryLen ? score : 0;
+      return calculateFuzzyScore(target, query);
     },
     async generateDynamicCommands(useCache = !0) {
       let dynamicCommands;
@@ -2967,7 +4241,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
       } else if (cleanQuery.length < PREFS2.minQueryLength)
         return [];
       let lowerQuery = cleanQuery.toLowerCase(), scoredCommands = allCommands.map((cmd) => {
-        let label = cmd.label || "", key = cmd.key || "", tags = (cmd.tags || []).join(" "), labelScore = this.calculateFuzzyScore(label, lowerQuery), keyScore = this.calculateFuzzyScore(key, lowerQuery), tagsScore = this.calculateFuzzyScore(tags, lowerQuery), recencyBonus = 0, recentIndex = this._recentCommands.indexOf(cmd.key);
+        let label = cmd.label || "", key = cmd.key || "", tags = [...cmd.tags || [], cmd.prettyName].filter(Boolean).join(" "), labelScore = this.calculateFuzzyScore(label, lowerQuery), keyScore = this.calculateFuzzyScore(key, lowerQuery), tagsScore = this.calculateFuzzyScore(tags, lowerQuery), recencyBonus = 0, recentIndex = this._recentCommands.indexOf(cmd.key);
         if (recentIndex > -1)
           recencyBonus = (this.MAX_RECENT_COMMANDS - recentIndex) * 2;
         let score = Math.max(labelScore * 1.5, keyScore, tagsScore * 0.5) + recencyBonus;
@@ -3031,7 +4305,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
           label: cmd.label,
           tooltiptext: cmd.label,
           class: "toolbarbutton-1 chromeclass-toolbar-additional zen-command-widget",
-          icon: cmd.icon || "chrome://browser/skin/trending.svg",
+          icon: cmd.icon || "chrome://browser/skin/zen-icons/bolt.svg",
           onClick: () => this.executeCommand(key)
         }), PREFS2.debugLog(`Successfully created widget "${widgetId}" for command: ${key}`);
       } catch (e) {
@@ -3069,6 +4343,9 @@ Only proceed if you trust the source of this command. You will not be asked agai
           return getPrettyShortcut(userShortcut);
         else
           return;
+      let dynamicCmd = this._dynamicCommandsCache?.find?.((c) => c.key === commandKey);
+      if (dynamicCmd?.shortcut)
+        return getPrettyShortcut(dynamicCmd.shortcut);
       if (!window.gZenKeyboardShortcutsManager || !window.gZenKeyboardShortcutsManager._currentShortcutList)
         return null;
       let shortcut = window.gZenKeyboardShortcutsManager._currentShortcutList.find((s) => (s.getAction() === commandKey || s.getID() === commandKey) && !s.isEmpty());
@@ -3088,7 +4365,17 @@ Only proceed if you trust the source of this command. You will not be asked agai
           if (event.key === "Backspace" && gURLBar.selectionStart === 0)
             event.preventDefault(), this.provider.dispose(!0);
         }
-      }), gURLBar.inputField.addEventListener("blur", onUrlbarClose), gURLBar.view.panel.addEventListener("popuphiding", onUrlbarClose), PREFS2.debugLog("URL bar close listeners attached.");
+      }), gURLBar.inputField.addEventListener("blur", onUrlbarClose), gURLBar.view.panel.addEventListener("popuphiding", onUrlbarClose), window.addEventListener("keydown", (event) => {
+        if (event.key !== "Tab" || event.defaultPrevented || event.ctrlKey || event.altKey || event.shiftKey)
+          return;
+        if (!PREFS2.prefix || document.activeElement !== gURLBar.inputField)
+          return;
+        if (!gURLBar.hasAttribute("breakout-extend") || gURLBar.value || gURLBar.searchMode)
+          return;
+        if (this.provider?._isInPrefixMode)
+          return;
+        event.preventDefault(), event.stopPropagation(), gURLBar.value = PREFS2.prefix, gURLBar.startQuery();
+      }, !0), PREFS2.debugLog("URL bar close listeners attached.");
     },
     async loadUserConfig() {
       Storage.reset(), this._userConfig = await Storage.loadSettings(), this.clearDynamicCommandsCache(), PREFS2.debugLog("User config loaded:", this._userConfig), this.applyNativeOverrides();
@@ -3213,6 +4500,8 @@ Only proceed if you trust the source of this command. You will not be asked agai
                 return !0;
               if (PREFS2.prefixRequired)
                 return !1;
+              if (getQuickSplitCommand(input) !== null)
+                return !0;
               if (input.length >= PREFS2.minQueryLength) {
                 let liveCommands = await self.generateLiveCommands(!0, !1);
                 return self.filterCommandsByInput(input, liveCommands, !1).length > 0;
@@ -3239,6 +4528,13 @@ Only proceed if you trust the source of this command. You will not be asked agai
                   if (inputBox && inputEl)
                     inputBox.insertBefore(indicator, inputEl);
                 }
+                try {
+                  window.gZenUIManager?.onUrlbarSearchModeChanged?.({
+                    detail: { searchMode: !0 }
+                  });
+                } catch (e) {
+                  PREFS2.debugLog("Native entry animation unavailable.", e);
+                }
                 query = input.substring(PREFS2.prefix.length).trim(), gURLBar2.value = query;
               } else
                 query = input;
@@ -3262,15 +4558,20 @@ Only proceed if you trust the source of this command. You will not be asked agai
                     title: cmd.label,
                     query: input,
                     keywords: cmd?.tags,
-                    icon: cmd.icon || "chrome://browser/skin/trending.svg",
+                    icon: cmd.icon || "chrome://browser/skin/zen-icons/bolt.svg",
                     shortcutContent: shortcut,
-                    dynamicType: DYNAMIC_TYPE_NAME
+                    dynamicType: DYNAMIC_TYPE_NAME,
+                    prettyName: cmd.prettyName,
+                    prettyIcon: cmd.prettyIcon,
+                    accentColor: cmd.accentColor
                   }
                 });
                 if (isHeuristic)
                   result.heuristic = !0;
                 return result._zenCmd = cmd, add(this, result), !0;
-              };
+              }, quickSplitCmd = getQuickSplitCommand(query);
+              if (quickSplitCmd && !context.canceled)
+                addResult(quickSplitCmd, !0);
               if (this._isInPrefixMode && !query) {
                 let count = 0, maxResults = PREFS2.maxCommandsPrefix, recentCmds = self._recentCommands.map((key) => liveCommands.find((c) => c.key === key)).filter(Boolean).filter((cmd) => self.commandIsVisible(cmd));
                 for (let cmd of recentCmds) {
@@ -3296,7 +4597,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
                 return;
               }
               let matches = self.filterCommandsByInput(query, liveCommands, this._isInPrefixMode);
-              if (!matches.length && this._isInPrefixMode) {
+              if (!matches.length && this._isInPrefixMode && !quickSplitCmd) {
                 addResult({
                   key: "no-results",
                   label: "No matching commands found",
@@ -3305,7 +4606,7 @@ Only proceed if you trust the source of this command. You will not be asked agai
                 });
                 return;
               }
-              matches.forEach((cmd, index) => addResult(cmd, index === 0));
+              matches.forEach((cmd, index) => addResult(cmd, index === 0 && !quickSplitCmd));
             } catch (e) {
               PREFS2.debugError("startQuery unexpected error:", e);
             }
@@ -3331,14 +4632,40 @@ Only proceed if you trust the source of this command. You will not be asked agai
                 gURLBar2.value = "";
               else
                 self._closeUrlBar();
-              self.addRecentCommand(cmd), setTimeout(() => self.executeCommand(cmd.key), 0);
+              if (!cmd.transient)
+                self.addRecentCommand(cmd);
+              setTimeout(() => self.executeCommand(cmd), 0);
             }
           }
           getViewUpdate(result) {
+            let prettyIconIsSvg = result.payload.prettyIcon && (result.payload.prettyIcon.endsWith(".svg") || result.payload.prettyIcon.endsWith(".png"));
             return {
-              icon: { attributes: { src: result.payload.icon } },
-              titleStrong: { textContent: result.payload.title },
-              shortcutContent: { textContent: result.payload.shortcutContent || "" }
+              icon: {
+                attributes: {
+                  src: result.payload.icon || "chrome://browser/skin/zen-icons/bolt.svg"
+                }
+              },
+              titleStrong: {
+                textContent: result.payload.title,
+                attributes: { dir: "ltr" }
+              },
+              shortcutContent: { textContent: result.payload.shortcutContent || "" },
+              prettyName: {
+                attributes: {
+                  hidden: !result.payload.prettyName,
+                  style: `--zen-primary-color: ${result.payload.accentColor || "currentColor"}`
+                }
+              },
+              prettyNameTitle: {
+                textContent: result.payload.prettyName ? prettyIconIsSvg || !result.payload.prettyIcon ? result.payload.prettyName : `${result.payload.prettyIcon}  ${result.payload.prettyName}` : "",
+                attributes: { dir: "ltr" }
+              },
+              prettyNameIcon: {
+                attributes: {
+                  src: result.payload.prettyIcon || "",
+                  hidden: !prettyIconIsSvg || !result.payload.prettyIcon
+                }
+              }
             };
           }
           getViewTemplate() {
@@ -3351,6 +4678,23 @@ Only proceed if you trust the source of this command. You will not be asked agai
                   tag: "span",
                   classList: ["urlbarView-title"],
                   children: [{ name: "titleStrong", tag: "strong" }]
+                },
+                {
+                  tag: "span",
+                  classList: ["urlbarView-prettyName"],
+                  hidden: !0,
+                  name: "prettyName",
+                  children: [
+                    {
+                      tag: "img",
+                      name: "prettyNameIcon",
+                      attributes: { hidden: !0 }
+                    },
+                    {
+                      name: "prettyNameTitle",
+                      tag: "span"
+                    }
+                  ]
                 },
                 { name: "shortcutContent", tag: "span", classList: ["urlbarView-shortcutContent"] }
               ]
